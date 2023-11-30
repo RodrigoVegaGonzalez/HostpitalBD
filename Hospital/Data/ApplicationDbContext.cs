@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Hospital.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Hospital.Data
@@ -9,5 +10,11 @@ namespace Hospital.Data
             : base(options)
         {
         }
+
+        public DbSet<Usuario> Usuario { get; set; }
+
+        public DbSet<Doctor> Doctor { get; set; }
+
+
     }
 }

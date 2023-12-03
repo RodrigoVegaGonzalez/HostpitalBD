@@ -15,6 +15,24 @@ namespace Hospital.Data
 
         public DbSet<Doctor> Doctor { get; set; }
 
+        public DbSet<Horario_Doctor> Horario_Doctor { get; set; }
+
+        public DbSet<Receta_Medica> Receta_Medica { get; set; }
+
+        public DbSet<Receta_Medicina> Receta_Medicina { get; set; }
+
+        public DbSet<Medicina> Medicina { get; set; }
+
+        public DbSet<Recepcionista> Recepcionista { get; set; }
+
+        public DbSet<Paciente> Paciente { get; set; }
+
+
+        public DbSet<Cita> Cita { get; set; }
+
+        public DbSet<Factura> Factura { get; set; }
+
 
     }
 }
+

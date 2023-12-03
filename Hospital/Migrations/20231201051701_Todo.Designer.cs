@@ -4,6 +4,7 @@ using Hospital.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Hospital.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231201051701_Todo")]
+    partial class Todo
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -478,7 +480,7 @@ namespace Hospital.Migrations
                         .IsRequired();
 
                     b.HasOne("Hospital.Models.Paciente", "Paciente")
-                        .WithMany("Citas")
+                        .WithMany("Cita")
                         .HasForeignKey("ID_Paciente")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -648,7 +650,7 @@ namespace Hospital.Migrations
 
             modelBuilder.Entity("Hospital.Models.Paciente", b =>
                 {
-                    b.Navigation("Citas");
+                    b.Navigation("Cita");
                 });
 
             modelBuilder.Entity("Hospital.Models.Receta_Medica", b =>

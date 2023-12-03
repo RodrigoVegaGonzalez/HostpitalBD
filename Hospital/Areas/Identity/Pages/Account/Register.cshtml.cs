@@ -6,10 +6,12 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading;
 using System.Threading.Tasks;
+using Hospital.Data;
 using Hospital.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
@@ -22,28 +24,33 @@ using Microsoft.Extensions.Logging;
 
 namespace Hospital.Areas.Identity.Pages.Account
 {
-    public class RegisterModel : PageModel
+    public class RegisterModel : PageModel 
     {
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly UserManager<IdentityUser> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IUserStore<IdentityUser> _userStore;
         private readonly IUserEmailStore<IdentityUser> _emailStore;
         private readonly ILogger<RegisterModel> _logger;
-        private readonly IEmailSender _emailSender;
+        private readonly ApplicationDbContext _context;
+        //   private readonly IEmailSender _emailSender;
 
         public RegisterModel(
             UserManager<IdentityUser> userManager,
             IUserStore<IdentityUser> userStore,
             SignInManager<IdentityUser> signInManager,
             ILogger<RegisterModel> logger,
-            IEmailSender emailSender)
+            RoleManager<IdentityRole> roleManager,
+            ApplicationDbContext context)
         {
             _userManager = userManager;
             _userStore = userStore;
             _emailStore = GetEmailStore();
             _signInManager = signInManager;
             _logger = logger;
-            _emailSender = emailSender;
+            _roleManager = roleManager;
+            _context = context;
+            // _emailSender = emailSender;
         }
 
         /// <summary>
@@ -118,12 +125,12 @@ namespace Hospital.Areas.Identity.Pages.Account
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             if (ModelState.IsValid)
             {
-                 var user = CreateUser();
-               /* var user = new Usuario
+                // var user = CreateUser();
+                var user = new Usuario
                 {
                     Nombre = Input.Nombre,
                     Telefono = Input.Telefono
-                };*/
+                };
 
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
@@ -132,6 +139,18 @@ namespace Hospital.Areas.Identity.Pages.Account
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User created a new account with password.");
+
+                    if (!await _roleManager.RoleExistsAsync("Recepcionista"))
+                        await _roleManager.CreateAsync(new IdentityRole("Recepcionista"));
+                    if (!await _roleManager.RoleExistsAsync("Doctor"))
+                        await _roleManager.CreateAsync(new IdentityRole("Doctor"));
+
+                    if (!await _roleManager.RoleExistsAsync("Paciente"))
+                        await _roleManager.CreateAsync(new IdentityRole("Paciente"));
+
+                    await _userManager.AddToRoleAsync(user, "Recepcionista");
+
+                    
 
                     var userId = await _userManager.GetUserIdAsync(user);
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
@@ -142,18 +161,28 @@ namespace Hospital.Areas.Identity.Pages.Account
                         values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
                         protocol: Request.Scheme);
 
-                    await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
-                        $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                         var Paciente = new Paciente
+                         {
+                             ID_Usuario = userId,
+                         };
 
-                    if (_userManager.Options.SignIn.RequireConfirmedAccount)
-                    {
-                        return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl = returnUrl });
-                    }
-                    else
-                    {
-                        await _signInManager.SignInAsync(user, isPersistent: false);
+                         _context.Add(Paciente);
+                        await _context.SaveChangesAsync();
+
+
+
+                    /* await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
+                         $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");*/
+
+                    /* if (_userManager.Options.SignIn.RequireConfirmedAccount)
+                     {
+                         return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl = returnUrl });
+                     }
+                     else
+                     {*/
+                    await _signInManager.SignInAsync(user, isPersistent: false);
                         return LocalRedirect(returnUrl);
-                    }
+                   // }
                 }
                 foreach (var error in result.Errors)
                 {

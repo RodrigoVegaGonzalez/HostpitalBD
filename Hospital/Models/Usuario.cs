@@ -10,5 +10,9 @@ namespace Hospital.Models
 
         public List<Doctor> Doctor { get; set; }
 
+        public List<Recepcionista> Recepcionista { get; set; }
+
+        public List<Paciente> Paciente { get; set; }
+
     }
 }

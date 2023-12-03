@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Hospital.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20231130144927_relaciones")]
-    partial class relaciones
+    [Migration("20231201110001_Horario")]
+    partial class Horario
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -23,6 +23,45 @@ namespace Hospital.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
+
+            modelBuilder.Entity("Hospital.Models.Cita", b =>
+                {
+                    b.Property<int>("ID_Cita")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID_Cita"), 1L, 1);
+
+                    b.Property<string>("Consultorio")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("Horario")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("ID_Doctor")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ID_Paciente")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ID_Receta_Medica")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("Pagado")
+                        .HasColumnType("bit");
+
+                    b.HasKey("ID_Cita");
+
+                    b.HasIndex("ID_Doctor");
+
+                    b.HasIndex("ID_Paciente");
+
+                    b.HasIndex("ID_Receta_Medica")
+                        .IsUnique();
+
+                    b.ToTable("Cita");
+                });
 
             modelBuilder.Entity("Hospital.Models.Doctor", b =>
                 {
@@ -52,6 +91,165 @@ namespace Hospital.Migrations
                     b.HasIndex("ID_Usuario");
 
                     b.ToTable("Doctor");
+                });
+
+            modelBuilder.Entity("Hospital.Models.Factura", b =>
+                {
+                    b.Property<int>("ID_Factura")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID_Factura"), 1L, 1);
+
+                    b.Property<int>("ID_Cita")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Otro_Servicios")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("Precio_Consulta")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("ID_Factura");
+
+                    b.HasIndex("ID_Cita")
+                        .IsUnique();
+
+                    b.ToTable("Factura");
+                });
+
+            modelBuilder.Entity("Hospital.Models.Horario_Doctor", b =>
+                {
+                    b.Property<int>("ID_Horario_Doctor")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID_Horario_Doctor"), 1L, 1);
+
+                    b.Property<string>("Dia_Hora_Inicio")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("Disponibilidad")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("ID_Doctor")
+                        .HasColumnType("int");
+
+                    b.HasKey("ID_Horario_Doctor");
+
+                    b.HasIndex("ID_Doctor");
+
+                    b.ToTable("Horario_Doctor");
+                });
+
+            modelBuilder.Entity("Hospital.Models.Medicina", b =>
+                {
+                    b.Property<int>("ID_Medicina")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID_Medicina"), 1L, 1);
+
+                    b.Property<bool>("En_Existencia")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("ID_Receta_Medicina")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("ID_Medicina");
+
+                    b.HasIndex("ID_Receta_Medicina");
+
+                    b.ToTable("Medicina");
+                });
+
+            modelBuilder.Entity("Hospital.Models.Paciente", b =>
+                {
+                    b.Property<int>("ID_Paciente")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID_Paciente"), 1L, 1);
+
+                    b.Property<string>("ID_Usuario")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("ID_Paciente");
+
+                    b.HasIndex("ID_Usuario");
+
+                    b.ToTable("Paciente");
+                });
+
+            modelBuilder.Entity("Hospital.Models.Recepcionista", b =>
+                {
+                    b.Property<int>("ID_Recepcionista")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID_Recepcionista"), 1L, 1);
+
+                    b.Property<string>("ID_Usuario")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("Turno")
+                        .HasColumnType("int");
+
+                    b.HasKey("ID_Recepcionista");
+
+                    b.HasIndex("ID_Usuario");
+
+                    b.ToTable("Recepcionista");
+                });
+
+            modelBuilder.Entity("Hospital.Models.Receta_Medica", b =>
+                {
+                    b.Property<int>("ID_Receta")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID_Receta"), 1L, 1);
+
+                    b.Property<int?>("DoctorID_Doctor")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Especificaciones")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ID_Doctor")
+                        .HasColumnType("int");
+
+                    b.HasKey("ID_Receta");
+
+                    b.HasIndex("DoctorID_Doctor");
+
+                    b.ToTable("Receta_Medica");
+                });
+
+            modelBuilder.Entity("Hospital.Models.Receta_Medicina", b =>
+                {
+                    b.Property<int>("ID_Receta_Medicina")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID_Receta_Medicina"), 1L, 1);
+
+                    b.Property<int>("ID_Receta_Medica")
+                        .HasColumnType("int");
+
+                    b.HasKey("ID_Receta_Medicina");
+
+                    b.HasIndex("ID_Receta_Medica");
+
+                    b.ToTable("Receta_Medicina");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -205,12 +403,10 @@ namespace Hospital.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
                     b.Property<string>("LoginProvider")
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ProviderKey")
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ProviderDisplayName")
                         .HasColumnType("nvarchar(max)");
@@ -247,12 +443,10 @@ namespace Hospital.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("LoginProvider")
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Name")
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Value")
                         .HasColumnType("nvarchar(max)");
@@ -277,6 +471,33 @@ namespace Hospital.Migrations
                     b.HasDiscriminator().HasValue("Usuario");
                 });
 
+            modelBuilder.Entity("Hospital.Models.Cita", b =>
+                {
+                    b.HasOne("Hospital.Models.Doctor", "Doctor")
+                        .WithMany("Cita")
+                        .HasForeignKey("ID_Doctor")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Hospital.Models.Paciente", "Paciente")
+                        .WithMany("Citas")
+                        .HasForeignKey("ID_Paciente")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Hospital.Models.Receta_Medica", "Receta_Medica")
+                        .WithOne("Cita")
+                        .HasForeignKey("Hospital.Models.Cita", "ID_Receta_Medica")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Doctor");
+
+                    b.Navigation("Paciente");
+
+                    b.Navigation("Receta_Medica");
+                });
+
             modelBuilder.Entity("Hospital.Models.Doctor", b =>
                 {
                     b.HasOne("Hospital.Models.Usuario", "Usuario")
@@ -286,6 +507,79 @@ namespace Hospital.Migrations
                         .IsRequired();
 
                     b.Navigation("Usuario");
+                });
+
+            modelBuilder.Entity("Hospital.Models.Factura", b =>
+                {
+                    b.HasOne("Hospital.Models.Cita", "Cita")
+                        .WithOne("Factura")
+                        .HasForeignKey("Hospital.Models.Factura", "ID_Cita")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Cita");
+                });
+
+            modelBuilder.Entity("Hospital.Models.Horario_Doctor", b =>
+                {
+                    b.HasOne("Hospital.Models.Doctor", "Doctor")
+                        .WithMany("Horario_Doctor")
+                        .HasForeignKey("ID_Doctor")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Doctor");
+                });
+
+            modelBuilder.Entity("Hospital.Models.Medicina", b =>
+                {
+                    b.HasOne("Hospital.Models.Receta_Medicina", "Receta_Medicina")
+                        .WithMany("Medicina")
+                        .HasForeignKey("ID_Receta_Medicina")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Receta_Medicina");
+                });
+
+            modelBuilder.Entity("Hospital.Models.Paciente", b =>
+                {
+                    b.HasOne("Hospital.Models.Usuario", "Usuario")
+                        .WithMany("Paciente")
+                        .HasForeignKey("ID_Usuario")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Usuario");
+                });
+
+            modelBuilder.Entity("Hospital.Models.Recepcionista", b =>
+                {
+                    b.HasOne("Hospital.Models.Usuario", "Usuario")
+                        .WithMany("Recepcionista")
+                        .HasForeignKey("ID_Usuario")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Usuario");
+                });
+
+            modelBuilder.Entity("Hospital.Models.Receta_Medica", b =>
+                {
+                    b.HasOne("Hospital.Models.Doctor", null)
+                        .WithMany("Receta_Medica")
+                        .HasForeignKey("DoctorID_Doctor");
+                });
+
+            modelBuilder.Entity("Hospital.Models.Receta_Medicina", b =>
+                {
+                    b.HasOne("Hospital.Models.Receta_Medica", "Receta_Medica")
+                        .WithMany()
+                        .HasForeignKey("ID_Receta_Medica")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Receta_Medica");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -339,9 +633,44 @@ namespace Hospital.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Hospital.Models.Cita", b =>
+                {
+                    b.Navigation("Factura")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Hospital.Models.Doctor", b =>
+                {
+                    b.Navigation("Cita");
+
+                    b.Navigation("Horario_Doctor");
+
+                    b.Navigation("Receta_Medica");
+                });
+
+            modelBuilder.Entity("Hospital.Models.Paciente", b =>
+                {
+                    b.Navigation("Citas");
+                });
+
+            modelBuilder.Entity("Hospital.Models.Receta_Medica", b =>
+                {
+                    b.Navigation("Cita")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Hospital.Models.Receta_Medicina", b =>
+                {
+                    b.Navigation("Medicina");
+                });
+
             modelBuilder.Entity("Hospital.Models.Usuario", b =>
                 {
                     b.Navigation("Doctor");
+
+                    b.Navigation("Paciente");
+
+                    b.Navigation("Recepcionista");
                 });
 #pragma warning restore 612, 618
         }

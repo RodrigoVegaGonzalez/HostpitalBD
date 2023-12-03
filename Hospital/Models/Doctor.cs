@@ -15,5 +15,11 @@ namespace Hospital.Models
         public string ID_Usuario{ get; set; }
 
         public Usuario Usuario { get; set; }
+
+        public List<Horario_Doctor> Horario_Doctor { get; set; }
+
+        public List<Receta_Medica> Receta_Medica { get; set; }
+
+        public List<Cita> Cita { get; set; }
     }
 }

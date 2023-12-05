@@ -7,7 +7,6 @@ namespace Hospital.Models
     {
         [Key]
         public int ID_Cita { get; set; }
-        public string Consultorio { get; set; }
         public bool Pagado { get; set; }
 
         public DateTime Horario { get; set; }
@@ -18,7 +17,7 @@ namespace Hospital.Models
         public Doctor Doctor { get; set; }
 
         [ForeignKey("Receta_Medica")]
-        public int ID_Receta_Medica { get; set; }
+        public int? ID_Receta_Medica { get; set; }
 
         public Receta_Medica Receta_Medica { get; set; }
 
@@ -26,12 +25,6 @@ namespace Hospital.Models
         public int ID_Paciente { get; set; }
 
         public Paciente Paciente { get; set; }
-
-        /*  [ForeignKey("Paciente")]
-          public int ID_Paciente { get; set; }
-
-          public Paciente Paciente { get; set; }*/
-
         public Factura Factura { get; set; }
     }
 

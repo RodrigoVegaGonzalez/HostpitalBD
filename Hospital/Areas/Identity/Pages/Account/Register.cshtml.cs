@@ -33,7 +33,7 @@ namespace Hospital.Areas.Identity.Pages.Account
         private readonly IUserEmailStore<IdentityUser> _emailStore;
         private readonly ILogger<RegisterModel> _logger;
         private readonly ApplicationDbContext _context;
-        //   private readonly IEmailSender _emailSender;
+       //   private readonly IEmailSender _emailSender;
 
         public RegisterModel(
             UserManager<IdentityUser> userManager,
@@ -133,7 +133,7 @@ namespace Hospital.Areas.Identity.Pages.Account
                 };
 
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
-                await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
+                //await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
                 var result = await _userManager.CreateAsync(user, Input.Password);
 
                 if (result.Succeeded)
@@ -148,9 +148,10 @@ namespace Hospital.Areas.Identity.Pages.Account
                     if (!await _roleManager.RoleExistsAsync("Paciente"))
                         await _roleManager.CreateAsync(new IdentityRole("Paciente"));
 
-                    await _userManager.AddToRoleAsync(user, "Recepcionista");
+                    //await _userManager.AddToRoleAsync(user, "Recepcionista");
+                    await _userManager.AddToRoleAsync(user, "Paciente");
 
-                    
+
 
                     var userId = await _userManager.GetUserIdAsync(user);
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
@@ -161,9 +162,15 @@ namespace Hospital.Areas.Identity.Pages.Account
                         values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
                         protocol: Request.Scheme);
 
+                    var Recepcionista = new Recepcionista {
+                        ID_Usuario = userId,
+                        Turno = 0};
+
+                   
+
                          var Paciente = new Paciente
                          {
-                             ID_Usuario = userId,
+                             ID_Usuario = userId
                          };
 
                          _context.Add(Paciente);

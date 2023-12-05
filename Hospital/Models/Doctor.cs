@@ -11,6 +11,7 @@ namespace Hospital.Models
         public int Turno { get; set; }
         public string Especialidad { get; set; }
 
+
         [ForeignKey("Usuario")]
         public string ID_Usuario{ get; set; }
 

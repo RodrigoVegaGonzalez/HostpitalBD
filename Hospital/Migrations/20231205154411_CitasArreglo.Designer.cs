@@ -4,6 +4,7 @@ using Hospital.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Hospital.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231205154411_CitasArreglo")]
+    partial class CitasArreglo
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -39,7 +41,7 @@ namespace Hospital.Migrations
                     b.Property<int>("ID_Paciente")
                         .HasColumnType("int");
 
-                    b.Property<int?>("ID_Receta_Medica")
+                    b.Property<int>("ID_Receta_Medica")
                         .HasColumnType("int");
 
                     b.Property<bool>("Pagado")
@@ -52,8 +54,7 @@ namespace Hospital.Migrations
                     b.HasIndex("ID_Paciente");
 
                     b.HasIndex("ID_Receta_Medica")
-                        .IsUnique()
-                        .HasFilter("[ID_Receta_Medica] IS NOT NULL");
+                        .IsUnique();
 
                     b.ToTable("Cita");
                 });
@@ -482,7 +483,9 @@ namespace Hospital.Migrations
 
                     b.HasOne("Hospital.Models.Receta_Medica", "Receta_Medica")
                         .WithOne("Cita")
-                        .HasForeignKey("Hospital.Models.Cita", "ID_Receta_Medica");
+                        .HasForeignKey("Hospital.Models.Cita", "ID_Receta_Medica")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Doctor");
 

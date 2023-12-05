@@ -53,6 +53,7 @@ namespace Hospital.Controllers
         [Authorize(Roles = "Recepcionista")]
         public IActionResult Create()
         {
+            ViewData["Usuario"] = new SelectList(_context.Usuario, "Nombre", "Nombre");
             ViewData["ID_Doctor"] = new SelectList(_context.Doctor, "ID_Doctor", "ID_Doctor");
             ViewData["ID_Paciente"] = new SelectList(_context.Paciente, "ID_Paciente", "ID_Paciente");
             ViewData["ID_Receta_Medica"] = new SelectList(_context.Receta_Medica, "ID_Receta", "Especificaciones");
@@ -64,14 +65,17 @@ namespace Hospital.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ID_Cita,Consultorio,Pagado,Horario,ID_Doctor,ID_Receta_Medica,ID_Paciente")] Cita cita)
+        public async Task<IActionResult> Create([Bind("ID_Cita,Pagado,Horario,ID_Doctor,ID_Paciente")] Cita cita)
         {
-            if (ModelState.IsValid)
-            {
+           //if (ModelState.IsValid)
+            
                 _context.Add(cita);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
-            }
+            
+            
+              
+            
             ViewData["ID_Doctor"] = new SelectList(_context.Doctor, "ID_Doctor", "ID_Doctor", cita.ID_Doctor);
             ViewData["ID_Paciente"] = new SelectList(_context.Paciente, "ID_Paciente", "ID_Paciente", cita.ID_Paciente);
             ViewData["ID_Receta_Medica"] = new SelectList(_context.Receta_Medica, "ID_Receta", "Especificaciones", cita.ID_Receta_Medica);

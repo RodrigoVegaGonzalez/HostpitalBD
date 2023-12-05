@@ -12,11 +12,11 @@
     <div class="col-md-4">
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
+            @* <div class="form-group">
                 <label asp-for="Consultorio" class="control-label"></label>
                 <input asp-for="Consultorio" class="form-control" />
                 <span asp-validation-for="Consultorio" class="text-danger"></span>
-            </div>
+            </div> *@
             <div class="form-group form-check">
                 <label class="form-check-label">
                     <input class="form-check-input" asp-for="Pagado" /> @Html.DisplayNameFor(model => model.Pagado)
@@ -31,10 +31,10 @@
                 <label asp-for="ID_Doctor" class="control-label"></label>
                 <select asp-for="ID_Doctor" class ="form-control" asp-items="ViewBag.ID_Doctor"></select>
             </div>
-            <div class="form-group">
+           @*  <div class="form-group">
                 <label asp-for="ID_Receta_Medica" class="control-label"></label>
                 <select asp-for="ID_Receta_Medica" class ="form-control" asp-items="ViewBag.ID_Receta_Medica"></select>
-            </div>
+            </div> *@
             <div class="form-group">
                 <label asp-for="ID_Paciente" class="control-label"></label>
                 <select asp-for="ID_Paciente" class ="form-control" asp-items="ViewBag.ID_Paciente"></select>

@@ -12,9 +12,42 @@
 <script>
    $(document).ready(function () {
         console.log("HOla JS")
-        $('#dia').on('change', function(){
-            var seleccion = $(this).val();
-            console.log("valor", seleccion)
+        $('#Dia').on("change", function(){
+            let seleccion = $(this).val();
+            const contenedor = $("#Horario")
+            let datos = {  "id": 1};
+            $.ajax({
+                    type: 'POST',
+                    url: '/Citas/CitaApi', // Reemplaza con la URL de tu controlador y acción
+                    data: {
+                        id:1
+                    },
+                    //contentType: 'application/json; charset=utf-16',
+                    dataType: 'json',
+                    success: function (respuesta) {
+                        console.log('Solicitud POST exitosa:', respuesta);
+                        respuesta.horarioDoctor.forEach(function(Dia){
+                            console.log(Dia.diaSemana)
+                            let fechai = new Date('2000-01-01T' + Dia.horaInicio)
+                            let fechaf  = new Date('2000-01-01T' + Dia.horaFin)
+                            let horarios = fechaf.getHours() - fechai.getHours()
+                            for(let i = 0; i < horarios; i++){
+                                 let radio = $('<input type="radio">');
+                                console.log( fechai.getHours() + i)
+                                 radio.attr('name', 'grupoRadios'); // Nombre del grupo de radio buttons
+                                radio.attr('value',  fechai.getHours() + i); // Valor del radio button
+                               var etiqueta = $('<label>').text(fechai.getHours() + i);
+                               contenedor.append(radio);
+                               contenedor.append(etiqueta);
+                            }
+                             // contenedor.append(radio);
+                               //contenedor.append(etiqueta);
+                        })
+                    },
+                    error: function (error) {
+                        console.error('Error en la solicitud POST:', error);
+                    }
+                });
         })
        
     })
@@ -49,6 +82,7 @@
             <div class="form-group">
                 <label asp-for="Horario" class="control-label"></label>
                <select name="Dia" id="Dia">
+                   <option>Seleccionar</option>
                     @foreach (var horario in ViewBag.HorarioDoctor)
                     {
                         <option>@horario.DiaSemana</option>
@@ -59,7 +93,7 @@
             </div
 
             <div id="Horario">
-                 <input name="Hora"/>
+                 
             </div>
            @* <div class="form-group">
                 <label asp-for="ID_Doctor" class="control-label"></label>

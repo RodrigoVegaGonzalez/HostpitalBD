@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Hospital.Data;
 using Hospital.Models;
 using Microsoft.AspNetCore.Authorization;
+using Humanizer.Localisation.DateToOrdinalWords;
 
 namespace Hospital.Controllers
 {
@@ -83,10 +84,13 @@ namespace Hospital.Controllers
             return View();
         }
 
+        [HttpPost]
         public ActionResult CitaApi(int id)
+        
         {
-
-            return Json(new { id });
+         //   string valor = Request.Form["id"];
+            var HorarioDoctor = _context.Horario_Doctor.Where(u => u.ID_Doctor == id).ToList();
+            return Json(new { HorarioDoctor });
         }
         public IActionResult CreateCita(int? ID_Docto)
         {

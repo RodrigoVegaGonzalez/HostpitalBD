@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Hospital.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20231201110001_Horario")]
-    partial class Horario
+    [Migration("20240108074518_HoraHorario")]
+    partial class HoraHorario
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -32,10 +32,6 @@ namespace Hospital.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID_Cita"), 1L, 1);
 
-                    b.Property<string>("Consultorio")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime>("Horario")
                         .HasColumnType("datetime2");
 
@@ -45,7 +41,7 @@ namespace Hospital.Migrations
                     b.Property<int>("ID_Paciente")
                         .HasColumnType("int");
 
-                    b.Property<int>("ID_Receta_Medica")
+                    b.Property<int?>("ID_Receta_Medica")
                         .HasColumnType("int");
 
                     b.Property<bool>("Pagado")
@@ -58,9 +54,31 @@ namespace Hospital.Migrations
                     b.HasIndex("ID_Paciente");
 
                     b.HasIndex("ID_Receta_Medica")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[ID_Receta_Medica] IS NOT NULL");
 
                     b.ToTable("Cita");
+                });
+
+            modelBuilder.Entity("Hospital.Models.Consultorio", b =>
+                {
+                    b.Property<int>("Id_Consultorio")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id_Consultorio"), 1L, 1);
+
+                    b.Property<string>("Direccion")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id_Consultorio");
+
+                    b.ToTable("Consultorio");
                 });
 
             modelBuilder.Entity("Hospital.Models.Doctor", b =>
@@ -70,10 +88,6 @@ namespace Hospital.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID_Doctor"), 1L, 1);
-
-                    b.Property<string>("Consultorio")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Especialidad")
                         .IsRequired()
@@ -86,9 +100,16 @@ namespace Hospital.Migrations
                     b.Property<int>("Turno")
                         .HasColumnType("int");
 
+                    b.Property<int?>("id_Consultorio")
+                        .HasColumnType("int");
+
                     b.HasKey("ID_Doctor");
 
                     b.HasIndex("ID_Usuario");
+
+                    b.HasIndex("id_Consultorio")
+                        .IsUnique()
+                        .HasFilter("[id_Consultorio] IS NOT NULL");
 
                     b.ToTable("Doctor");
                 });
@@ -126,19 +147,24 @@ namespace Hospital.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID_Horario_Doctor"), 1L, 1);
 
-                    b.Property<string>("Dia_Hora_Inicio")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("DiaSemana")
+                        .HasColumnType("int");
 
                     b.Property<bool>("Disponibilidad")
                         .HasColumnType("bit");
 
-                    b.Property<int>("ID_Doctor")
+                    b.Property<int>("DoctorID_Doctor")
                         .HasColumnType("int");
+
+                    b.Property<TimeSpan>("HoraFin")
+                        .HasColumnType("time");
+
+                    b.Property<TimeSpan>("HoraInicio")
+                        .HasColumnType("time");
 
                     b.HasKey("ID_Horario_Doctor");
 
-                    b.HasIndex("ID_Doctor");
+                    b.HasIndex("DoctorID_Doctor");
 
                     b.ToTable("Horario_Doctor");
                 });
@@ -487,9 +513,7 @@ namespace Hospital.Migrations
 
                     b.HasOne("Hospital.Models.Receta_Medica", "Receta_Medica")
                         .WithOne("Cita")
-                        .HasForeignKey("Hospital.Models.Cita", "ID_Receta_Medica")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("Hospital.Models.Cita", "ID_Receta_Medica");
 
                     b.Navigation("Doctor");
 
@@ -505,6 +529,12 @@ namespace Hospital.Migrations
                         .HasForeignKey("ID_Usuario")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("Hospital.Models.Consultorio", "Consultorio")
+                        .WithOne("Doctor")
+                        .HasForeignKey("Hospital.Models.Doctor", "id_Consultorio");
+
+                    b.Navigation("Consultorio");
 
                     b.Navigation("Usuario");
                 });
@@ -524,7 +554,7 @@ namespace Hospital.Migrations
                 {
                     b.HasOne("Hospital.Models.Doctor", "Doctor")
                         .WithMany("Horario_Doctor")
-                        .HasForeignKey("ID_Doctor")
+                        .HasForeignKey("DoctorID_Doctor")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -636,6 +666,12 @@ namespace Hospital.Migrations
             modelBuilder.Entity("Hospital.Models.Cita", b =>
                 {
                     b.Navigation("Factura")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Hospital.Models.Consultorio", b =>
+                {
+                    b.Navigation("Doctor")
                         .IsRequired();
                 });
 

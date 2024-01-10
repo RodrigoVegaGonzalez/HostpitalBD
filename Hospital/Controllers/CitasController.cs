@@ -53,10 +53,15 @@ namespace Hospital.Controllers
         [Authorize(Roles = "Recepcionista")]
         public IActionResult Create()
         {
+
+            var NombreDoctor = _context.Doctor.Include(d => d.Usuario).ToList();
+            var NombrePaciente = _context.Paciente.Include(d => d.Usuario).ToList();
             ViewData["Usuario"] = new SelectList(_context.Usuario, "Nombre", "Nombre");
             ViewData["ID_Doctor"] = new SelectList(_context.Doctor, "ID_Doctor", "ID_Doctor");
             ViewData["ID_Paciente"] = new SelectList(_context.Paciente, "ID_Paciente", "ID_Paciente");
             ViewData["ID_Receta_Medica"] = new SelectList(_context.Receta_Medica, "ID_Receta", "Especificaciones");
+            ViewBag.NombreDoctor = NombreDoctor;
+            ViewBag.NombrePaciente = NombrePaciente;
             return View();
         }
 

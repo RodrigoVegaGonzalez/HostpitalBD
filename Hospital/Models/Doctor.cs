@@ -7,7 +7,6 @@ namespace Hospital.Models
     {
         [Key]
         public int ID_Doctor { get; set; }
-        public string Consultorio { get; set; }
         public int Turno { get; set; }
         public string Especialidad { get; set; }
 
@@ -22,5 +21,10 @@ namespace Hospital.Models
         public List<Receta_Medica> Receta_Medica { get; set; }
 
         public List<Cita> Cita { get; set; }
+
+        [ForeignKey("Consultorio")]
+        public int? id_Consultorio { get; set; }
+
+        public Consultorio? Consultorio { get; set; }
     }
 }

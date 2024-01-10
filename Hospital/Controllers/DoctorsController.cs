@@ -36,7 +36,7 @@ namespace Hospital.Controllers
         // GET: Doctors
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Doctor.Include(d => d.Usuario);
+            var applicationDbContext = _context.Doctor.Include(d => d.Usuario).Include(u => u.Horario_Doctor);
             return View(await applicationDbContext.ToListAsync());
         }
 
@@ -103,7 +103,7 @@ namespace Hospital.Controllers
                 await _userManager.AddToRoleAsync(user, "Doctor");
                 var doctor = new Doctor
                 {
-                    Consultorio = UsuarioDoctor.Consultorio,
+                    //Consultorio = UsuarioDoctor.Consultorio,
                     Turno = 1,
                     Especialidad = UsuarioDoctor.Especialidad,
                     ID_Usuario = userId

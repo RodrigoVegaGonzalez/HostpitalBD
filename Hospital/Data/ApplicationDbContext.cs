@@ -1,6 +1,7 @@
 ﻿using Hospital.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Hospital.ViewModel;
 
 namespace Hospital.Data
 {
@@ -31,6 +32,8 @@ namespace Hospital.Data
         public DbSet<Cita> Cita { get; set; }
 
         public DbSet<Factura> Factura { get; set; }
+
+        public DbSet<Hospital.ViewModel.DoctorHorarioListaVM>? DoctorHorarioListaVM { get; set; }
 
 
     }

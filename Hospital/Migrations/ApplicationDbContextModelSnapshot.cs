@@ -58,6 +58,27 @@ namespace Hospital.Migrations
                     b.ToTable("Cita");
                 });
 
+            modelBuilder.Entity("Hospital.Models.Consultorio", b =>
+                {
+                    b.Property<int>("Id_Consultorio")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id_Consultorio"), 1L, 1);
+
+                    b.Property<string>("Direccion")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id_Consultorio");
+
+                    b.ToTable("Consultorio");
+                });
+
             modelBuilder.Entity("Hospital.Models.Doctor", b =>
                 {
                     b.Property<int>("ID_Doctor")
@@ -65,10 +86,6 @@ namespace Hospital.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID_Doctor"), 1L, 1);
-
-                    b.Property<string>("Consultorio")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Especialidad")
                         .IsRequired()
@@ -81,9 +98,16 @@ namespace Hospital.Migrations
                     b.Property<int>("Turno")
                         .HasColumnType("int");
 
+                    b.Property<int?>("id_Consultorio")
+                        .HasColumnType("int");
+
                     b.HasKey("ID_Doctor");
 
                     b.HasIndex("ID_Usuario");
+
+                    b.HasIndex("id_Consultorio")
+                        .IsUnique()
+                        .HasFilter("[id_Consultorio] IS NOT NULL");
 
                     b.ToTable("Doctor");
                 });
@@ -121,12 +145,18 @@ namespace Hospital.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID_Horario_Doctor"), 1L, 1);
 
-                    b.Property<string>("Dia_Hora_Inicio")
+                    b.Property<string>("DiaSemana")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("Disponibilidad")
                         .HasColumnType("bit");
+
+                    b.Property<TimeSpan>("HoraFin")
+                        .HasColumnType("time");
+
+                    b.Property<TimeSpan>("HoraInicio")
+                        .HasColumnType("time");
 
                     b.Property<int>("ID_Doctor")
                         .HasColumnType("int");
@@ -499,6 +529,12 @@ namespace Hospital.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Hospital.Models.Consultorio", "Consultorio")
+                        .WithOne("Doctor")
+                        .HasForeignKey("Hospital.Models.Doctor", "id_Consultorio");
+
+                    b.Navigation("Consultorio");
+
                     b.Navigation("Usuario");
                 });
 
@@ -629,6 +665,12 @@ namespace Hospital.Migrations
             modelBuilder.Entity("Hospital.Models.Cita", b =>
                 {
                     b.Navigation("Factura")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Hospital.Models.Consultorio", b =>
+                {
+                    b.Navigation("Doctor")
                         .IsRequired();
                 });
 

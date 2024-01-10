@@ -32,7 +32,7 @@ namespace Hospital.Controllers
             _signInManager = signInManager;
          //   _emailStore = emailStore;
         }
-
+      
         // GET: Doctors
         public async Task<IActionResult> Index()
         {

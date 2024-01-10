@@ -51,9 +51,46 @@ namespace Hospital.Controllers
         // GET: Citas/Create
 
         [Authorize(Roles = "Recepcionista")]
-        public IActionResult Create()
+        public IActionResult Create(int id)
+        {
+            List<TimeSpan> Horas = new List<TimeSpan>();
+            TimeSpan unaHora = new TimeSpan(1, 0, 0);
+            var HorarioDoctor = _context.Horario_Doctor.Where(u => u.ID_Doctor == id);
+            foreach(var u in HorarioDoctor)
+            {
+                
+                var HorasTotales = u.HoraFin - u.HoraInicio;
+                for(var i = 0; i < HorasTotales.Hours; i++)
+                {
+                    Horas.Add(u.HoraInicio + unaHora);
+                }
+            }
+            
+            
+            
+           
+            var NombreDoctor = _context.Doctor.Include(d => d.Usuario).ToList();
+            var NombrePaciente = _context.Paciente.Include(d => d.Usuario).ToList();
+            
+            ViewData["Usuario"] = new SelectList(_context.Usuario, "Nombre", "Nombre");
+            ViewData["ID_Doctor"] = new SelectList(_context.Doctor, "ID_Doctor", "ID_Doctor");
+            ViewData["ID_Paciente"] = new SelectList(_context.Paciente, "ID_Paciente", "ID_Paciente");
+            ViewData["ID_Receta_Medica"] = new SelectList(_context.Receta_Medica, "ID_Receta", "Especificaciones");
+            ViewBag.NombreDoctor = NombreDoctor;
+            ViewBag.NombrePaciente = NombrePaciente;
+            ViewBag.HorarioDoctor = HorarioDoctor;
+            ViewBag.Horas = Horas;
+            return View();
+        }
+
+        public ActionResult CitaApi(int id)
         {
 
+            return Json(new { id });
+        }
+        public IActionResult CreateCita(int? ID_Docto)
+        {
+            var HorarioDoctor = _context.Horario_Doctor.ToList();
             var NombreDoctor = _context.Doctor.Include(d => d.Usuario).ToList();
             var NombrePaciente = _context.Paciente.Include(d => d.Usuario).ToList();
             ViewData["Usuario"] = new SelectList(_context.Usuario, "Nombre", "Nombre");
@@ -62,6 +99,7 @@ namespace Hospital.Controllers
             ViewData["ID_Receta_Medica"] = new SelectList(_context.Receta_Medica, "ID_Receta", "Especificaciones");
             ViewBag.NombreDoctor = NombreDoctor;
             ViewBag.NombrePaciente = NombrePaciente;
+           
             return View();
         }
 

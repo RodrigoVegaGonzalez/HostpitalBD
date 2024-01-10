@@ -4,6 +4,23 @@
     ViewData["Title"] = "Create";
 }
 
+<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.css' />
+<script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js'></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js'></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.js'></script>
+
+<script>
+   $(document).ready(function () {
+        console.log("HOla JS")
+        $('#dia').on('change', function(){
+            var seleccion = $(this).val();
+            console.log("valor", seleccion)
+        })
+       
+    })
+</script>
+
+
 <h1>Create</h1>
 
 <h4>Cita</h4>
@@ -11,6 +28,8 @@
 <div class="row">
     <div class="col-md-4">
         <form asp-action="Create">
+
+            <div id='calendario'></div>
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             @* <div class="form-group">
                 <label asp-for="Consultorio" class="control-label"></label>
@@ -28,6 +47,21 @@
                 <span asp-validation-for="Horario" class="text-danger"></span>
             </div>
             <div class="form-group">
+                <label asp-for="Horario" class="control-label"></label>
+               <select name="Dia" id="Dia">
+                    @foreach (var horario in ViewBag.HorarioDoctor)
+                    {
+                        <option>@horario.DiaSemana</option>
+                       
+                    }
+                </select>
+                <span asp-validation-for="Horario" class="text-danger"></span>
+            </div
+
+            <div id="Horario">
+                 <input name="Hora"/>
+            </div>
+           @* <div class="form-group">
                 <label asp-for="ID_Doctor" class="control-label"></label>
                 <select asp-for="ID_Doctor" class ="form-control">
                     @foreach (var Doctor in ViewBag.NombreDoctor)
@@ -35,11 +69,12 @@
                         <option>@Doctor.Usuario.Nombre</option>
                     }
                 </select>
-            </div>
-           @*  <div class="form-group">
+            </div>*@
+          
+             <div class="form-group">
                 <label asp-for="ID_Receta_Medica" class="control-label"></label>
                 <select asp-for="ID_Receta_Medica" class ="form-control" asp-items="ViewBag.ID_Receta_Medica"></select>
-            </div> *@
+            </div> 
             <div class="form-group">
                 <label asp-for="ID_Paciente" class="control-label"></label>
                 <select asp-for="ID_Paciente" class="form-control">
@@ -63,3 +98,5 @@
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }
+
+

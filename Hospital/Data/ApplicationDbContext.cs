@@ -16,8 +16,11 @@ namespace Hospital.Data
 
         public DbSet<Doctor> Doctor { get; set; }
 
-        public DbSet<Horario_Doctor> Horario_Doctor { get; set; }
+        public DbSet<Horas_Doctor> Horas_Doctor { get; set; }
 
+        public DbSet<DiasDoctor> DiasDoctor { get; set; }
+
+        
         public DbSet<Receta_Medica> Receta_Medica { get; set; }
 
         public DbSet<Receta_Medicina> Receta_Medicina { get; set; }
@@ -33,7 +36,6 @@ namespace Hospital.Data
 
         public DbSet<Factura> Factura { get; set; }
 
-        public DbSet<Hospital.ViewModel.DoctorHorarioListaVM>? DoctorHorarioListaVM { get; set; }
 
 
     }

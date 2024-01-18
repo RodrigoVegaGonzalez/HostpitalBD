@@ -18,7 +18,7 @@ namespace Hospital.Models
 
         public List<Receta_Medica> Receta_Medica { get; set; }
 
-        public List<Especialidad> Especialidad { get; set; }
+        public List<Especialidad>? Especialidad { get; set; }
 
         public List<Cita> Cita { get; set; }
 

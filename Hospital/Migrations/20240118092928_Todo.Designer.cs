@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Hospital.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240110030440_Mensada")]
-    partial class Mensada
+    [Migration("20240118092928_Todo")]
+    partial class Todo
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -81,6 +81,31 @@ namespace Hospital.Migrations
                     b.ToTable("Consultorio");
                 });
 
+            modelBuilder.Entity("Hospital.Models.DiasDoctor", b =>
+                {
+                    b.Property<int>("ID_DiasDoctor")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID_DiasDoctor"), 1L, 1);
+
+                    b.Property<string>("Dia")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("Disponibilidad")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("ID_Doctor")
+                        .HasColumnType("int");
+
+                    b.HasKey("ID_DiasDoctor");
+
+                    b.HasIndex("ID_Doctor");
+
+                    b.ToTable("DiasDoctor");
+                });
+
             modelBuilder.Entity("Hospital.Models.Doctor", b =>
                 {
                     b.Property<int>("ID_Doctor")
@@ -88,10 +113,6 @@ namespace Hospital.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID_Doctor"), 1L, 1);
-
-                    b.Property<string>("Especialidad")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ID_Usuario")
                         .IsRequired()
@@ -112,6 +133,28 @@ namespace Hospital.Migrations
                         .HasFilter("[id_Consultorio] IS NOT NULL");
 
                     b.ToTable("Doctor");
+                });
+
+            modelBuilder.Entity("Hospital.Models.Especialidad", b =>
+                {
+                    b.Property<int>("Id_Especialidad")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id_Especialidad"), 1L, 1);
+
+                    b.Property<int?>("DoctorID_Doctor")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id_Especialidad");
+
+                    b.HasIndex("DoctorID_Doctor");
+
+                    b.ToTable("Especialidad");
                 });
 
             modelBuilder.Entity("Hospital.Models.Factura", b =>
@@ -168,6 +211,28 @@ namespace Hospital.Migrations
                     b.HasIndex("ID_Doctor");
 
                     b.ToTable("Horario_Doctor");
+                });
+
+            modelBuilder.Entity("Hospital.Models.Horas_Doctor", b =>
+                {
+                    b.Property<int>("ID_Horas_Doctor")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID_Horas_Doctor"), 1L, 1);
+
+                    b.Property<string>("Hora")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ID_DiasDoctor")
+                        .HasColumnType("int");
+
+                    b.HasKey("ID_Horas_Doctor");
+
+                    b.HasIndex("ID_DiasDoctor");
+
+                    b.ToTable("Horas_Doctor");
                 });
 
             modelBuilder.Entity("Hospital.Models.Medicina", b =>
@@ -487,6 +552,10 @@ namespace Hospital.Migrations
                 {
                     b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityUser");
 
+                    b.Property<string>("CURP")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Nombre")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -523,6 +592,17 @@ namespace Hospital.Migrations
                     b.Navigation("Receta_Medica");
                 });
 
+            modelBuilder.Entity("Hospital.Models.DiasDoctor", b =>
+                {
+                    b.HasOne("Hospital.Models.Doctor", "Doctor")
+                        .WithMany()
+                        .HasForeignKey("ID_Doctor")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Doctor");
+                });
+
             modelBuilder.Entity("Hospital.Models.Doctor", b =>
                 {
                     b.HasOne("Hospital.Models.Usuario", "Usuario")
@@ -538,6 +618,13 @@ namespace Hospital.Migrations
                     b.Navigation("Consultorio");
 
                     b.Navigation("Usuario");
+                });
+
+            modelBuilder.Entity("Hospital.Models.Especialidad", b =>
+                {
+                    b.HasOne("Hospital.Models.Doctor", null)
+                        .WithMany("Especialidad")
+                        .HasForeignKey("DoctorID_Doctor");
                 });
 
             modelBuilder.Entity("Hospital.Models.Factura", b =>
@@ -560,6 +647,17 @@ namespace Hospital.Migrations
                         .IsRequired();
 
                     b.Navigation("Doctor");
+                });
+
+            modelBuilder.Entity("Hospital.Models.Horas_Doctor", b =>
+                {
+                    b.HasOne("Hospital.Models.DiasDoctor", "DiasDoctor")
+                        .WithMany("Horas_Doctor")
+                        .HasForeignKey("ID_DiasDoctor")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("DiasDoctor");
                 });
 
             modelBuilder.Entity("Hospital.Models.Medicina", b =>
@@ -676,9 +774,16 @@ namespace Hospital.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Hospital.Models.DiasDoctor", b =>
+                {
+                    b.Navigation("Horas_Doctor");
+                });
+
             modelBuilder.Entity("Hospital.Models.Doctor", b =>
                 {
                     b.Navigation("Cita");
+
+                    b.Navigation("Especialidad");
 
                     b.Navigation("Horario_Doctor");
 

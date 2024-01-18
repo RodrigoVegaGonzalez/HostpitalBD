@@ -83,6 +83,10 @@ namespace Hospital.Areas.Identity.Pages.Account
             public string Nombre { get; set; }
 
             public string Telefono { get; set; }
+
+             [Required(ErrorMessage = "El campo CURP es obligatorio.")]
+             [RegularExpression(@"^[A-Z]{4}[0-9]{6}[HM]{1}[A-Z]{5}[0-9]{2}$", ErrorMessage = "El formato de CURP no es válido.")]
+            public string CURP { get; set; }
             /// <summary>
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
             ///     directly from your code. This API may change or be removed in future releases.
@@ -149,7 +153,7 @@ namespace Hospital.Areas.Identity.Pages.Account
                         await _roleManager.CreateAsync(new IdentityRole("Paciente"));
 
                     //await _userManager.AddToRoleAsync(user, "Recepcionista");
-                    await _userManager.AddToRoleAsync(user, "Paciente");
+                    await _userManager.AddToRoleAsync(user, "Recepcionista");
 
 
 

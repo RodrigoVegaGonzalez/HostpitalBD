@@ -105,7 +105,7 @@ namespace Hospital.Controllers
                 {
                     //Consultorio = UsuarioDoctor.Consultorio,
                     Turno = 1,
-                    Especialidad = UsuarioDoctor.Especialidad,
+                    //Especialidad = UsuarioDoctor.Especialidad,
                     ID_Usuario = userId
 
                 };

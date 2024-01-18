@@ -56,16 +56,16 @@ namespace Hospital.Controllers
         {
             List<TimeSpan> Horas = new List<TimeSpan>();
             TimeSpan unaHora = new TimeSpan(1, 0, 0);
-            var HorarioDoctor = _context.Horario_Doctor.Where(u => u.ID_Doctor == id);
-            foreach(var u in HorarioDoctor)
-            {
+           // var HorarioDoctor = _context.Horario_Doctor.Where(u => u.ID_Doctor == id);
+            //foreach(var u in HorarioDoctor)
+            //{
                 
-                var HorasTotales = u.HoraFin - u.HoraInicio;
-                for(var i = 0; i < HorasTotales.Hours; i++)
-                {
-                    Horas.Add(u.HoraInicio + unaHora);
-                }
-            }
+            //    var HorasTotales = u.HoraFin - u.HoraInicio;
+            //    for(var i = 0; i < HorasTotales.Hours; i++)
+            //    {
+            //        Horas.Add(u.HoraInicio + unaHora);
+            //    }
+           // }
             
             
             
@@ -79,22 +79,15 @@ namespace Hospital.Controllers
             ViewData["ID_Receta_Medica"] = new SelectList(_context.Receta_Medica, "ID_Receta", "Especificaciones");
             ViewBag.NombreDoctor = NombreDoctor;
             ViewBag.NombrePaciente = NombrePaciente;
-            ViewBag.HorarioDoctor = HorarioDoctor;
+          //  ViewBag.HorarioDoctor = HorarioDoctor;
             ViewBag.Horas = Horas;
             return View();
         }
 
-        [HttpPost]
-        public ActionResult CitaApi(int id)
-        
-        {
-         //   string valor = Request.Form["id"];
-            var HorarioDoctor = _context.Horario_Doctor.Where(u => u.ID_Doctor == id).ToList();
-            return Json(new { HorarioDoctor });
-        }
+      
         public IActionResult CreateCita(int? ID_Docto)
         {
-            var HorarioDoctor = _context.Horario_Doctor.ToList();
+           // var HorarioDoctor = _context.Horario_Doctor.ToList();
             var NombreDoctor = _context.Doctor.Include(d => d.Usuario).ToList();
             var NombrePaciente = _context.Paciente.Include(d => d.Usuario).ToList();
             ViewData["Usuario"] = new SelectList(_context.Usuario, "Nombre", "Nombre");

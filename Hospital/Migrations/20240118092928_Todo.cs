@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Hospital.Migrations
 {
-    public partial class todo : Migration
+    public partial class Todo : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -31,6 +31,7 @@ namespace Hospital.Migrations
                     Discriminator = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Nombre = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Telefono = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CURP = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -186,7 +187,8 @@ namespace Hospital.Migrations
                         name: "FK_Paciente_AspNetUsers_ID_Usuario",
                         column: x => x.ID_Usuario,
                         principalTable: "AspNetUsers",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -216,7 +218,6 @@ namespace Hospital.Migrations
                     ID_Doctor = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Turno = table.Column<int>(type: "int", nullable: false),
-                    Especialidad = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ID_Usuario = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     id_Consultorio = table.Column<int>(type: "int", nullable: true)
                 },
@@ -237,23 +238,63 @@ namespace Hospital.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "DiasDoctor",
+                columns: table => new
+                {
+                    ID_DiasDoctor = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ID_Doctor = table.Column<int>(type: "int", nullable: false),
+                    Disponibilidad = table.Column<bool>(type: "bit", nullable: false),
+                    Dia = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DiasDoctor", x => x.ID_DiasDoctor);
+                    table.ForeignKey(
+                        name: "FK_DiasDoctor_Doctor_ID_Doctor",
+                        column: x => x.ID_Doctor,
+                        principalTable: "Doctor",
+                        principalColumn: "ID_Doctor",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Especialidad",
+                columns: table => new
+                {
+                    Id_Especialidad = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Nombre = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    DoctorID_Doctor = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Especialidad", x => x.Id_Especialidad);
+                    table.ForeignKey(
+                        name: "FK_Especialidad_Doctor_DoctorID_Doctor",
+                        column: x => x.DoctorID_Doctor,
+                        principalTable: "Doctor",
+                        principalColumn: "ID_Doctor");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Horario_Doctor",
                 columns: table => new
                 {
                     ID_Horario_Doctor = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Disponibilidad = table.Column<bool>(type: "bit", nullable: false),
-                    Calendario = table.Column<int>(type: "int", nullable: false),
+                    DiaSemana = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     HoraInicio = table.Column<TimeSpan>(type: "time", nullable: false),
                     HoraFin = table.Column<TimeSpan>(type: "time", nullable: false),
-                    DoctorID_Doctor = table.Column<int>(type: "int", nullable: false)
+                    ID_Doctor = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Horario_Doctor", x => x.ID_Horario_Doctor);
                     table.ForeignKey(
-                        name: "FK_Horario_Doctor_Doctor_DoctorID_Doctor",
-                        column: x => x.DoctorID_Doctor,
+                        name: "FK_Horario_Doctor_Doctor_ID_Doctor",
+                        column: x => x.ID_Doctor,
                         principalTable: "Doctor",
                         principalColumn: "ID_Doctor",
                         onDelete: ReferentialAction.Cascade);
@@ -280,6 +321,26 @@ namespace Hospital.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Horas_Doctor",
+                columns: table => new
+                {
+                    ID_Horas_Doctor = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Hora = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ID_DiasDoctor = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Horas_Doctor", x => x.ID_Horas_Doctor);
+                    table.ForeignKey(
+                        name: "FK_Horas_Doctor_DiasDoctor_ID_DiasDoctor",
+                        column: x => x.ID_DiasDoctor,
+                        principalTable: "DiasDoctor",
+                        principalColumn: "ID_DiasDoctor",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Cita",
                 columns: table => new
                 {
@@ -298,14 +359,12 @@ namespace Hospital.Migrations
                         name: "FK_Cita_Doctor_ID_Doctor",
                         column: x => x.ID_Doctor,
                         principalTable: "Doctor",
-                        principalColumn: "ID_Doctor",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "ID_Doctor");
                     table.ForeignKey(
                         name: "FK_Cita_Paciente_ID_Paciente",
                         column: x => x.ID_Paciente,
                         principalTable: "Paciente",
-                        principalColumn: "ID_Paciente",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "ID_Paciente");
                     table.ForeignKey(
                         name: "FK_Cita_Receta_Medica_ID_Receta_Medica",
                         column: x => x.ID_Receta_Medica,
@@ -431,6 +490,11 @@ namespace Hospital.Migrations
                 filter: "[ID_Receta_Medica] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
+                name: "IX_DiasDoctor_ID_Doctor",
+                table: "DiasDoctor",
+                column: "ID_Doctor");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Doctor_id_Consultorio",
                 table: "Doctor",
                 column: "id_Consultorio",
@@ -443,15 +507,25 @@ namespace Hospital.Migrations
                 column: "ID_Usuario");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Especialidad_DoctorID_Doctor",
+                table: "Especialidad",
+                column: "DoctorID_Doctor");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Factura_ID_Cita",
                 table: "Factura",
                 column: "ID_Cita",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Horario_Doctor_DoctorID_Doctor",
+                name: "IX_Horario_Doctor_ID_Doctor",
                 table: "Horario_Doctor",
-                column: "DoctorID_Doctor");
+                column: "ID_Doctor");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Horas_Doctor_ID_DiasDoctor",
+                table: "Horas_Doctor",
+                column: "ID_DiasDoctor");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Medicina_ID_Receta_Medicina",
@@ -497,10 +571,16 @@ namespace Hospital.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "Especialidad");
+
+            migrationBuilder.DropTable(
                 name: "Factura");
 
             migrationBuilder.DropTable(
                 name: "Horario_Doctor");
+
+            migrationBuilder.DropTable(
+                name: "Horas_Doctor");
 
             migrationBuilder.DropTable(
                 name: "Medicina");
@@ -513,6 +593,9 @@ namespace Hospital.Migrations
 
             migrationBuilder.DropTable(
                 name: "Cita");
+
+            migrationBuilder.DropTable(
+                name: "DiasDoctor");
 
             migrationBuilder.DropTable(
                 name: "Receta_Medicina");

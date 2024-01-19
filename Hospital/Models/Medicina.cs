@@ -13,9 +13,7 @@ namespace Hospital.Models
         [Required]
         public bool En_Existencia { get; set; }
 
-        [ForeignKey("Receta_Medicina")]
-        public int ID_Receta_Medicina { get; set; }
-        public Receta_Medicina Receta_Medicina { get; set; }
+        public Receta_Medica? Receta_Medica { get; set; }
 
     }
 }

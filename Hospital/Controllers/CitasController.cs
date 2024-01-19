@@ -7,8 +7,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Hospital.Data;
 using Hospital.Models;
-using Microsoft.AspNetCore.Authorization;
-using Humanizer.Localisation.DateToOrdinalWords;
+using Hospital.Migrations;
+using Humanizer;
 
 namespace Hospital.Controllers
 {
@@ -24,10 +24,44 @@ namespace Hospital.Controllers
         // GET: Citas
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Cita.Include(c => c.Doctor).Include(c => c.Paciente).Include(c => c.Receta_Medica);
+            var applicationDbContext = _context.Cita
+                .Include(c => c.Doctor)
+                .Include(c => c.Paciente)
+                .Include(c => c.Receta_Medica)
+                .Include(c => c.Paciente.Usuario)
+                .Include(c => c.Doctor.Usuario)
+                .Include(c => c.Doctor.Especialidad)
+                .Include(c => c.Doctor.Consultorio);
             return View(await applicationDbContext.ToListAsync());
         }
 
+        public async Task<IActionResult> IndexDoctor(int id)
+        {
+            var applicationDbContext = _context.Cita
+                .Include(c => c.Doctor)
+                .Include(c => c.Paciente)
+                .Include(c => c.Receta_Medica)
+                .Include(c => c.Paciente.Usuario)
+                .Include(c => c.Doctor.Usuario)
+                .Include(c => c.Doctor.Especialidad)
+                .Include(c => c.Doctor.Consultorio)
+                .Where(u => u.ID_Doctor == id);
+            return View(await applicationDbContext.ToListAsync());
+        }
+
+        public async Task<IActionResult> IndexPaciente(int id)
+        {
+            var applicationDbContext = _context.Cita
+                .Include(c => c.Doctor)
+                .Include(c => c.Paciente)
+                .Include(c => c.Receta_Medica)
+                .Include(c => c.Paciente.Usuario)
+                .Include(c => c.Doctor.Usuario)
+                .Include(c => c.Doctor.Especialidad)
+                .Include(c => c.Doctor.Consultorio)
+                .Where(u => u.ID_Paciente == id);
+            return View(await applicationDbContext.ToListAsync());
+        }
         // GET: Citas/Details/5
         public async Task<IActionResult> Details(int? id)
         {
@@ -39,7 +73,11 @@ namespace Hospital.Controllers
             var cita = await _context.Cita
                 .Include(c => c.Doctor)
                 .Include(c => c.Paciente)
+                .Include(c => c.Doctor.Usuario)
+                .Include(c => c.Paciente.Usuario)
                 .Include(c => c.Receta_Medica)
+                 .Include(c => c.Doctor.Especialidad)
+                .Include(c => c.Doctor.Consultorio)
                 .FirstOrDefaultAsync(m => m.ID_Cita == id);
             if (cita == null)
             {
@@ -50,53 +88,15 @@ namespace Hospital.Controllers
         }
 
         // GET: Citas/Create
-
-        [Authorize(Roles = "Recepcionista")]
-        public IActionResult Create(int id)
+        public IActionResult Create()
         {
-            List<TimeSpan> Horas = new List<TimeSpan>();
-            TimeSpan unaHora = new TimeSpan(1, 0, 0);
-           // var HorarioDoctor = _context.Horario_Doctor.Where(u => u.ID_Doctor == id);
-            //foreach(var u in HorarioDoctor)
-            //{
-                
-            //    var HorasTotales = u.HoraFin - u.HoraInicio;
-            //    for(var i = 0; i < HorasTotales.Hours; i++)
-            //    {
-            //        Horas.Add(u.HoraInicio + unaHora);
-            //    }
-           // }
-            
-            
-            
-           
-            var NombreDoctor = _context.Doctor.Include(d => d.Usuario).ToList();
-            var NombrePaciente = _context.Paciente.Include(d => d.Usuario).ToList();
-            
-            ViewData["Usuario"] = new SelectList(_context.Usuario, "Nombre", "Nombre");
+            var doctor = _context.Doctor.Include("Usuario").ToList();
+            var paciente = _context.Paciente.Include("Usuario").ToList();
+            ViewBag.Doctor = doctor;
+            ViewBag.Paciente = paciente;
             ViewData["ID_Doctor"] = new SelectList(_context.Doctor, "ID_Doctor", "ID_Doctor");
             ViewData["ID_Paciente"] = new SelectList(_context.Paciente, "ID_Paciente", "ID_Paciente");
             ViewData["ID_Receta_Medica"] = new SelectList(_context.Receta_Medica, "ID_Receta", "Especificaciones");
-            ViewBag.NombreDoctor = NombreDoctor;
-            ViewBag.NombrePaciente = NombrePaciente;
-          //  ViewBag.HorarioDoctor = HorarioDoctor;
-            ViewBag.Horas = Horas;
-            return View();
-        }
-
-      
-        public IActionResult CreateCita(int? ID_Docto)
-        {
-           // var HorarioDoctor = _context.Horario_Doctor.ToList();
-            var NombreDoctor = _context.Doctor.Include(d => d.Usuario).ToList();
-            var NombrePaciente = _context.Paciente.Include(d => d.Usuario).ToList();
-            ViewData["Usuario"] = new SelectList(_context.Usuario, "Nombre", "Nombre");
-            ViewData["ID_Doctor"] = new SelectList(_context.Doctor, "ID_Doctor", "ID_Doctor");
-            ViewData["ID_Paciente"] = new SelectList(_context.Paciente, "ID_Paciente", "ID_Paciente");
-            ViewData["ID_Receta_Medica"] = new SelectList(_context.Receta_Medica, "ID_Receta", "Especificaciones");
-            ViewBag.NombreDoctor = NombreDoctor;
-            ViewBag.NombrePaciente = NombrePaciente;
-           
             return View();
         }
 
@@ -105,23 +105,60 @@ namespace Hospital.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ID_Cita,Pagado,Horario,ID_Doctor,ID_Paciente")] Cita cita)
+        public async Task<IActionResult> Create([Bind("ID_Cita,Pagado,Día,Hora,ID_Doctor,ID_Receta_Medica,ID_Paciente")] Cita cita)
         {
-           //if (ModelState.IsValid)
-            
-                _context.Add(cita);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            
-            
-              
-            
+            var disponibilidad = _context.Cita.Where(u => u.Día == cita.Día)
+                                 .Where(o => o.Hora.Hour == cita.Hora.Hour)
+                                 .Where(u => u.ID_Doctor == cita.ID_Doctor)
+                                .ToList();
+            // var doctdisp = _context.Cita;
+            var doctor = _context.Doctor.Include("Usuario").ToList();
+            var paciente = _context.Paciente.Include("Usuario").ToList();
+            ViewBag.Doctor = doctor;
+            ViewBag.Paciente = paciente;
             ViewData["ID_Doctor"] = new SelectList(_context.Doctor, "ID_Doctor", "ID_Doctor", cita.ID_Doctor);
             ViewData["ID_Paciente"] = new SelectList(_context.Paciente, "ID_Paciente", "ID_Paciente", cita.ID_Paciente);
-            ViewData["ID_Receta_Medica"] = new SelectList(_context.Receta_Medica, "ID_Receta", "Especificaciones", cita.ID_Receta_Medica);
+//ViewData["ID_Receta_Medica"] = new SelectList(_context.Receta_Medica, "ID_Receta", "Especificaciones", cita.ID_Receta_Medica);
+            DateTime hoy = DateTime.Now;
+            var validacion = (cita.Día - hoy).Days;
+             if ((hoy - cita.Día).Days > 90)
+            {
+                ViewBag.MuchosDias = "Escoja una fecha mas reciente";
+                return View();
+            }
+            
+           if(cita.Día < hoy)
+            {
+                ViewBag.ErrorDia = "No se pueden poner fechas anteriores";
+               // ViewBag.ErrorMensaje = "Horario ocupado";
+                
+                return View();
+            }
+            if (disponibilidad.Count != 0)
+            {
+                ViewBag.ErrorMensaje = "Horario ocupado";
+                // var doctor = _context.Doctor.Include("Usuario").ToList();
+                //var paciente = _context.Paciente.Include("Usuario").ToList();
+                //ViewBag.Doctor = doctor;
+                //ViewBag.Paciente = paciente;
+                //ViewData["ID_Doctor"] = new SelectList(_context.Doctor, "ID_Doctor", "ID_Doctor", cita.ID_Doctor);
+                //ViewData["ID_Paciente"] = new SelectList(_context.Paciente, "ID_Paciente", "ID_Paciente", cita.ID_Paciente);
+                //ViewData["ID_Receta_Medica"] = new SelectList(_context.Receta_Medica, "ID_Receta", "Especificaciones", cita.ID_Receta_Medica);
+                return View();
+            }
+            if (ModelState.IsValid)
+            {
+                _context.Add(cita);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Details), new { id = cita.ID_Cita });
+            }
+           
+          
+           
             return View(cita);
         }
 
+       
         // GET: Citas/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
@@ -137,7 +174,7 @@ namespace Hospital.Controllers
             }
             ViewData["ID_Doctor"] = new SelectList(_context.Doctor, "ID_Doctor", "ID_Doctor", cita.ID_Doctor);
             ViewData["ID_Paciente"] = new SelectList(_context.Paciente, "ID_Paciente", "ID_Paciente", cita.ID_Paciente);
-            ViewData["ID_Receta_Medica"] = new SelectList(_context.Receta_Medica, "ID_Receta", "Especificaciones", cita.ID_Receta_Medica);
+        //    ViewData["ID_Receta_Medica"] = new SelectList(_context.Receta_Medica, "ID_Receta", "Especificaciones", cita.ID_Receta_Medica);
             return View(cita);
         }
 
@@ -146,8 +183,41 @@ namespace Hospital.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ID_Cita,Consultorio,Pagado,Horario,ID_Doctor,ID_Receta_Medica,ID_Paciente")] Cita cita)
+        public async Task<IActionResult> Edit(int id, [Bind("ID_Cita,Pagado,Día,Hora,ID_Doctor,ID_Receta_Medica,ID_Paciente")] Cita cita)
         {
+            ViewData["ID_Doctor"] = new SelectList(_context.Doctor, "ID_Doctor", "ID_Doctor", cita.ID_Doctor);
+            ViewData["ID_Paciente"] = new SelectList(_context.Paciente, "ID_Paciente", "ID_Paciente", cita.ID_Paciente);
+           // ViewData["ID_Receta_Medica"] = new SelectList(_context.Receta_Medica, "ID_Receta", "Especificaciones", cita.ID_Receta_Medica);
+            var disponibilidad = _context.Cita.Where(u => u.Día == cita.Día)
+                                .Where(o => o.Hora.Hour == cita.Hora.Hour)
+                                .Where(u => u.ID_Doctor == cita.ID_Doctor)
+                               .ToList();
+            DateTime hoy = DateTime.Now;
+            if ((cita.Día - hoy).Days > 90)
+            {
+                ViewBag.MuchosDias = "Escoja una fecha mas reciente";
+                return View();
+            }
+
+            if (cita.Día < hoy)
+            {
+                ViewBag.ErrorDia = "No se pueden poner fechas anteriores";
+                // ViewBag.ErrorMensaje = "Horario ocupado";
+
+                return View();
+            }
+            if (disponibilidad.Count != 0)
+            {
+                ViewBag.ErrorMensaje = "Horario ocupado";
+                // var doctor = _context.Doctor.Include("Usuario").ToList();
+                //var paciente = _context.Paciente.Include("Usuario").ToList();
+                //ViewBag.Doctor = doctor;
+                //ViewBag.Paciente = paciente;
+                //ViewData["ID_Doctor"] = new SelectList(_context.Doctor, "ID_Doctor", "ID_Doctor", cita.ID_Doctor);
+                //ViewData["ID_Paciente"] = new SelectList(_context.Paciente, "ID_Paciente", "ID_Paciente", cita.ID_Paciente);
+                //ViewData["ID_Receta_Medica"] = new SelectList(_context.Receta_Medica, "ID_Receta", "Especificaciones", cita.ID_Receta_Medica);
+                return View();
+            }
             if (id != cita.ID_Cita)
             {
                 return NotFound();
@@ -175,11 +245,13 @@ namespace Hospital.Controllers
             }
             ViewData["ID_Doctor"] = new SelectList(_context.Doctor, "ID_Doctor", "ID_Doctor", cita.ID_Doctor);
             ViewData["ID_Paciente"] = new SelectList(_context.Paciente, "ID_Paciente", "ID_Paciente", cita.ID_Paciente);
-            ViewData["ID_Receta_Medica"] = new SelectList(_context.Receta_Medica, "ID_Receta", "Especificaciones", cita.ID_Receta_Medica);
+//ViewData["ID_Receta_Medica"] = new SelectList(_context.Receta_Medica, "ID_Receta", "Especificaciones", cita.ID_Receta_Medica);
             return View(cita);
         }
 
         // GET: Citas/Delete/5
+
+       
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null || _context.Cita == null)
@@ -205,11 +277,23 @@ namespace Hospital.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
+            var otra = await _context.Cita
+               .Include(c => c.Doctor)
+               .Include(c => c.Paciente)
+               .Include(c => c.Receta_Medica)
+               .FirstOrDefaultAsync(m => m.ID_Cita == id);
             if (_context.Cita == null)
             {
                 return Problem("Entity set 'ApplicationDbContext.Cita'  is null.");
             }
             var cita = await _context.Cita.FindAsync(id);
+            DateTime hoy = DateTime.Now;
+            var hora = cita.Día;
+            if ((cita.Día - hoy).Days < 1)
+            {
+                ViewBag.ErrorHora = "No se pueden eliminar citas con menos de 24 horas de anticipación";
+                return View(otra);
+            }
             if (cita != null)
             {
                 _context.Cita.Remove(cita);

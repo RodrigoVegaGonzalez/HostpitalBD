@@ -4,56 +4,11 @@
     ViewData["Title"] = "Create";
 }
 
-<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.css' />
-<script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js'></script>
-<script src='https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js'></script>
-<script src='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.js'></script>
-
-<script>
-   $(document).ready(function () {
-        console.log("HOla JS")
-        $('#Dia').on("change", function(){
-            let seleccion = $(this).val();
-            const contenedor = $("#Horario")
-            let datos = {  "id": 1};
-            $.ajax({
-                    type: 'POST',
-                    url: '/Citas/CitaApi', // Reemplaza con la URL de tu controlador y acción
-                    data: {
-                        id:1
-                    },
-                    //contentType: 'application/json; charset=utf-16',
-                    dataType: 'json',
-                    success: function (respuesta) {
-                        console.log('Solicitud POST exitosa:', respuesta);
-                        respuesta.horarioDoctor.forEach(function(Dia){
-                            console.log(Dia.diaSemana)
-                            let fechai = new Date('2000-01-01T' + Dia.horaInicio)
-                            let fechaf  = new Date('2000-01-01T' + Dia.horaFin)
-                            let horarios = fechaf.getHours() - fechai.getHours()
-                            for(let i = 0; i < horarios; i++){
-                                 let radio = $('<input type="radio">');
-                                console.log( fechai.getHours() + i)
-                                 radio.attr('name', 'grupoRadios'); // Nombre del grupo de radio buttons
-                                radio.attr('value',  fechai.getHours() + i); // Valor del radio button
-                               var etiqueta = $('<label>').text(fechai.getHours() + i);
-                               contenedor.append(radio);
-                               contenedor.append(etiqueta);
-                            }
-                             // contenedor.append(radio);
-                               //contenedor.append(etiqueta);
-                        })
-                    },
-                    error: function (error) {
-                        console.error('Error en la solicitud POST:', error);
-                    }
-                });
-        })
-       
-    })
-</script>
-
-
+@{
+    string errorMensaje = ViewBag.ErrorMensaje as string;
+    string diaerrorneo = ViewBag.ErrorDia as string;
+    string muchodias = ViewBag.MuchosDias as string;
+}
 <h1>Create</h1>
 
 <h4>Cita</h4>
@@ -61,60 +16,58 @@
 <div class="row">
     <div class="col-md-4">
         <form asp-action="Create">
-
-            <div id='calendario'></div>
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            @* <div class="form-group">
-                <label asp-for="Consultorio" class="control-label"></label>
-                <input asp-for="Consultorio" class="form-control" />
-                <span asp-validation-for="Consultorio" class="text-danger"></span>
-            </div> *@
             <div class="form-group form-check">
                 <label class="form-check-label">
                     <input class="form-check-input" asp-for="Pagado" /> @Html.DisplayNameFor(model => model.Pagado)
                 </label>
             </div>
             <div class="form-group">
-                <label asp-for="Horario" class="control-label"></label>
-                <input asp-for="Horario" class="form-control" />
-                <span asp-validation-for="Horario" class="text-danger"></span>
+                <label asp-for="Día" class="control-label"></label>
+                <input asp-for="Día" class="form-control" />
+                <span asp-validation-for="Día" class="text-danger"></span>
             </div>
+            @if (!string.IsNullOrEmpty(diaerrorneo))
+            {
+                <div class="alert alert-danger">
+                    @diaerrorneo
+                </div>
+            }
+            @if (!string.IsNullOrEmpty(muchodias))
+            {
+                <div class="alert alert-danger">
+                    @muchodias
+                </div>
+            }
             <div class="form-group">
-                <label asp-for="Horario" class="control-label"></label>
-               <select name="Dia" id="Dia">
-                   <option>Seleccionar</option>
-                    @foreach (var horario in ViewBag.HorarioDoctor)
-                    {
-                        <option>@horario.DiaSemana</option>
-                       
-                    }
-                </select>
-                <span asp-validation-for="Horario" class="text-danger"></span>
-            </div
-
-            <div id="Horario">
-                 
+                <label asp-for="Hora" class="control-label"></label>
+                <input asp-for="Hora" class="form-control  />
+                <span asp-validation-for="Hora" class="text-danger"></span>
             </div>
-           @* <div class="form-group">
+            @if (!string.IsNullOrEmpty(errorMensaje))
+            {
+                <div class="alert alert-danger">
+                    @errorMensaje
+                </div>
+            }
+            <div class="form-group">
                 <label asp-for="ID_Doctor" class="control-label"></label>
                 <select asp-for="ID_Doctor" class ="form-control">
-                    @foreach (var Doctor in ViewBag.NombreDoctor)
+                    <option>Seleccionar</option>
+                    @foreach(var doctor in ViewBag.Doctor)
                     {
-                        <option>@Doctor.Usuario.Nombre</option>
+                        <option value="@doctor.ID_Doctor">@doctor.Usuario.Nombre</option>
                     }
                 </select>
-            </div>*@
-          
-             <div class="form-group">
-                <label asp-for="ID_Receta_Medica" class="control-label"></label>
-                <select asp-for="ID_Receta_Medica" class ="form-control" asp-items="ViewBag.ID_Receta_Medica"></select>
-            </div> 
+            </div>
+           
             <div class="form-group">
                 <label asp-for="ID_Paciente" class="control-label"></label>
-                <select asp-for="ID_Paciente" class="form-control">
-                    @foreach(var Paciente in ViewBag.NombrePaciente)
+                <select asp-for="ID_Paciente" class ="form-control">
+                    <option>Seleccionar</option>
+                    @foreach(var paciente in ViewBag.Paciente)
                     {
-                        <option>@Paciente.Usuario.Nombre</option>
+                        <option value="@paciente.ID_Paciente">@paciente.Usuario.Nombre</option>
                     }
                 </select>
             </div>
@@ -132,5 +85,3 @@
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }
-
-

@@ -12,14 +12,14 @@
 <table class="table">
     <thead>
         <tr>
-            @* <th>
-                @Html.DisplayNameFor(model => model.Consultorio)
-            </th> *@
             <th>
                 @Html.DisplayNameFor(model => model.Pagado)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Horario)
+                @Html.DisplayNameFor(model => model.Día)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Hora)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Doctor)
@@ -30,34 +30,48 @@
             <th>
                 @Html.DisplayNameFor(model => model.Paciente)
             </th>
+            <th>
+                Especialidad
+            </th>
+            <th>
+                Consultorio
+            </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
 @foreach (var item in Model) {
         <tr>
-           @*  <td>
-                @Html.DisplayFor(modelItem => item.Consultorio)
-            </td> *@
             <td>
                 @Html.DisplayFor(modelItem => item.Pagado)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Horario)
+                    @item.Día.ToString("dd/MM/yyyy")
+                   @* @Html.DisplayFor(modelItem => item.Día)*@
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Doctor.ID_Doctor)
+                @Html.DisplayFor(modelItem => item.Hora)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Doctor.Usuario.Nombre)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Receta_Medica.Especificaciones)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Paciente.ID_Paciente)
+                @Html.DisplayFor(modelItem => item.Paciente.Usuario.Nombre)
             </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Doctor.Especialidad.Nombre)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Doctor.Consultorio.Nombre)
+                </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.ID_Cita">Edit</a> |
                 <a asp-action="Details" asp-route-id="@item.ID_Cita">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.ID_Cita">Delete</a>
+                <a asp-action="Delete" asp-route-id="@item.ID_Cita">Delete</a> |
+                <a asp-action="CreateCita" asp-controller="Receta_Medica" asp-route-id="@item.ID_Cita">Agegar Receta</a>
             </td>
         </tr>
 }

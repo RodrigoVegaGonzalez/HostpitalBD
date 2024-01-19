@@ -13,12 +13,14 @@ using System.Threading;
 using System.Threading.Tasks;
 using Hospital.Data;
 using Hospital.Models;
+using Hospital.ViewModel;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 
@@ -127,6 +129,17 @@ namespace Hospital.Areas.Identity.Pages.Account
         {
             returnUrl ??= Url.Content("~/");
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+
+            var validarCURP = _context.Usuario.Where(u => u.CURP == Input.CURP).FirstOrDefault();
+            if (validarCURP != null)
+            {
+                var consultorios = _context.Consultorio.ToList();
+                var especialidad = _context.Especialidad.ToList();
+
+                throw new InvalidOperationException("El CURP ya ah sido usado");
+
+
+            }
             if (ModelState.IsValid)
             {
                 // var user = CreateUser();
@@ -153,7 +166,7 @@ namespace Hospital.Areas.Identity.Pages.Account
                         await _roleManager.CreateAsync(new IdentityRole("Paciente"));
 
                     //await _userManager.AddToRoleAsync(user, "Recepcionista");
-                    await _userManager.AddToRoleAsync(user, "Recepcionista");
+                    await _userManager.AddToRoleAsync(user, "Paciente");
 
 
 

@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Delete";
+    string error = ViewBag.Error as string;
 }
 
 <h1>Delete</h1>
@@ -36,6 +37,13 @@
             @Html.DisplayFor(model => model.Usuario.Id)
         </dd>
     </dl>
+
+    @if (!string.IsNullOrEmpty(error))
+    {
+        <div class="alert alert-danger">
+            @error
+        </div>
+    }
     
     <form asp-action="Delete">
         <input type="hidden" asp-for="ID_Doctor" />

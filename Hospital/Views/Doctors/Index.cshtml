@@ -12,9 +12,7 @@
 <table class="table">
     <thead>
         <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Consultorio)
-            </th>
+
             <th>
                 @Html.DisplayNameFor(model => model.Turno)
             </th>
@@ -25,7 +23,10 @@
                 @Html.DisplayNameFor(model => model.Usuario.Nombre)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Horario_Doctor)
+                @Html.DisplayNameFor(model => model.Consultorio)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Cedula)
             </th>
             <th></th>
         </tr>
@@ -33,26 +34,30 @@
     <tbody>
 @foreach (var item in Model) {
         <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Consultorio)
-            </td>
+           
             <td>
                 @Html.DisplayFor(modelItem => item.Turno)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Especialidad)
+                @Html.DisplayFor(modelItem => item.Especialidad.Nombre)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Usuario.Nombre)
             </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Horario_Doctor)
+                <td>
+                    @Html.DisplayFor(modelItem => item.Consultorio.Nombre)
+                </td>
+             <td>
+                @Html.DisplayFor(modelItem => item.Cedula)
             </td>
+               
+           
             <td>
                 <a asp-action="Edit" asp-route-id="@item.ID_Doctor">Edit</a> |
                 <a asp-action="Details" asp-route-id="@item.ID_Doctor">Details</a> |
                 <a asp-action="Delete" asp-route-id="@item.ID_Doctor">Delete</a> |
-                    <a asp-area="" asp-route-id="@item.ID_Doctor" asp-controller="Citas" asp-action="Create">Crear Citas</a>
+                <a asp-area="" asp-route-id="@item.ID_Doctor" asp-controller="Citas" asp-action="IndexDoctor">Ver Citas</a> | 
+                <a asp-area="" asp-route-id="@item.ID_Doctor" asp-controller="Receta_Medica" asp-action="IndexDoctor">Ver Recetas</a>
             </td>
         </tr>
 }

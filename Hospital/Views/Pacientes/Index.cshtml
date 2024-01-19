@@ -13,7 +13,10 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Usuario)
+                @Html.DisplayNameFor(model => model.Usuario.Nombre)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Usuario.CURP)
             </th>
             <th></th>
         </tr>
@@ -24,10 +27,14 @@
             <td>
                 @Html.DisplayFor(modelItem => item.Usuario.Nombre)
             </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Usuario.Nombre)
+                </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.ID_Paciente">Edit</a> |
                 <a asp-action="Details" asp-route-id="@item.ID_Paciente">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.ID_Paciente">Delete</a>
+                <a asp-action="Delete" asp-route-id="@item.ID_Paciente">Delete</a> |
+                <a asp-controller="Citas" asp-action="IndexPaciente" asp-route-id="@item.ID_Paciente">Ver Citas</a>
             </td>
         </tr>
 }

@@ -23,7 +23,6 @@ namespace Hospital.Data
         
         public DbSet<Receta_Medica> Receta_Medica { get; set; }
 
-        public DbSet<Receta_Medicina> Receta_Medicina { get; set; }
 
         public DbSet<Medicina> Medicina { get; set; }
 
@@ -35,6 +34,10 @@ namespace Hospital.Data
         public DbSet<Cita> Cita { get; set; }
 
         public DbSet<Factura> Factura { get; set; }
+
+        public DbSet<Hospital.Models.Consultorio>? Consultorio { get; set; }
+
+        public DbSet<Hospital.Models.Especialidad>? Especialidad { get; set; }
 
 
 

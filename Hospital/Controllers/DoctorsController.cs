@@ -10,6 +10,7 @@ using Hospital.Models;
 using Hospital.ViewModel;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
+using Hospital.Migrations;
 
 namespace Hospital.Controllers
 {
@@ -36,7 +37,9 @@ namespace Hospital.Controllers
         // GET: Doctors
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Doctor.Include(d => d.Usuario).Include(u => u.Horario_Doctor);
+            var applicationDbContext = _context.Doctor.Include(d => d.Usuario)
+                .Include(u => u.Consultorio)
+                .Include(u => u.Especialidad);
             return View(await applicationDbContext.ToListAsync());
         }
 
@@ -63,6 +66,10 @@ namespace Hospital.Controllers
         [Authorize(Roles = "Recepcionista")]
         public IActionResult Create()
         {
+            var consultorios = _context.Consultorio.ToList();
+            var especialidad = _context.Especialidad.ToList();
+            ViewBag.Consultorio = consultorios;
+            ViewBag.Especialidad = especialidad;
             ViewData["ID_Usuario"] = new SelectList(_context.Usuario, "Id", "Id");
             return View();
         }
@@ -73,13 +80,25 @@ namespace Hospital.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Recepcionista")]
-        public async Task<IActionResult> Create([Bind("ID_Doctor,Consultorio,Turno,Especialidad,Nombre,Telefono,Email,Password")]UsuarioDoctoVM UsuarioDoctor)
+        public async Task<IActionResult> Create([Bind("ID_Doctor,Consultorio,Turno,Especialidad,Nombre,Cedula,Telefono,Email,Password,CURP")]UsuarioDoctoVM UsuarioDoctor)
         {
+            var validarCURP = _context.Usuario.Where(u => u.CURP == UsuarioDoctor.CURP).FirstOrDefault();
+            if(validarCURP != null)
+            {
+                var consultorios = _context.Consultorio.ToList();
+                var especialidad = _context.Especialidad.ToList();
+                ViewBag.Consultorio = consultorios;
+                ViewBag.Especialidad = especialidad;
+                ViewBag.Error = "El CURP ya ah sido utilizado";
+                ViewData["ID_Usuario"] = new SelectList(_context.Usuario, "Id", "Id");
+                return View();
+            }
 
             var user = new Usuario
             {
                 Nombre = UsuarioDoctor.Nombre,
-                Telefono = UsuarioDoctor.Telefono
+                Telefono = UsuarioDoctor.Telefono,
+                CURP =UsuarioDoctor.CURP
             };
 
             await _userStore.SetUserNameAsync(user, UsuarioDoctor.Email, CancellationToken.None);
@@ -103,13 +122,18 @@ namespace Hospital.Controllers
                 await _userManager.AddToRoleAsync(user, "Doctor");
                 var doctor = new Doctor
                 {
-                    //Consultorio = UsuarioDoctor.Consultorio,
+                ID_Consultorio = int.Parse(UsuarioDoctor.Consultorio),
+                ID_Especialidad = int.Parse(UsuarioDoctor.Especialidad),
+                Cedula = UsuarioDoctor.Cedula,
+                  //  Consultorio = UsuarioDoctor.Consultorio,
                     Turno = 1,
                     //Especialidad = UsuarioDoctor.Especialidad,
                     ID_Usuario = userId
 
                 };
-              
+          //  var especialidad = _context.Especialidad.Where(u => u.ID_Especialidad == int.Parse(UsuarioDoctor.Especialidad));
+          //  doctor.Especialidad.Add((Especialidad)especialidad);
+                    
                     _context.Add(doctor);
                     await _context.SaveChangesAsync();
                     return RedirectToAction(nameof(Index));
@@ -131,6 +155,8 @@ namespace Hospital.Controllers
                 {
                     return NotFound();
                 }
+                var consultorios = _context.Consultorio.ToList();
+                ViewBag.Consultorio = consultorios;
                 ViewData["ID_Usuario"] = new SelectList(_context.Usuario, "Id", "Id", doctor.ID_Usuario);
                 return View(doctor);
             }
@@ -195,6 +221,21 @@ namespace Hospital.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
+            var citas = _context.Cita.Where(u => u.ID_Doctor == id).ToList();
+            DateTime hoy = DateTime.Now;
+            foreach(var cita in citas)
+            {
+                if ((cita.Día - hoy).Days > 0)
+                {
+                    var doc = await _context.Doctor
+          .Include(d => d.Usuario)
+          .FirstOrDefaultAsync(m => m.ID_Doctor == id);
+                    ViewBag.Error = "No se puede borrar porque tiene citas asignadas";
+                    return View(doc);
+                }
+            }
+           
+            
             if (_context.Doctor == null)
             {
                 return Problem("Entity set 'ApplicationDbContext.Doctor'  is null.");

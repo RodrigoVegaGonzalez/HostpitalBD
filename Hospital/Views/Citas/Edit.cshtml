@@ -4,6 +4,12 @@
     ViewData["Title"] = "Edit";
 }
 
+@{
+    string errorMensaje = ViewBag.ErrorMensaje as string;
+    string diaerrorneo = ViewBag.ErrorDia as string;
+    string muchodias = ViewBag.MuchosDias as string;
+}
+
 <h1>Edit</h1>
 
 <h4>Cita</h4>
@@ -13,31 +19,49 @@
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="ID_Cita" />
-          @*   <div class="form-group">
-                <label asp-for="Consultorio" class="control-label"></label>
-                <input asp-for="Consultorio" class="form-control" />
-                <span asp-validation-for="Consultorio" class="text-danger"></span>
-            </div> *@
             <div class="form-group form-check">
                 <label class="form-check-label">
                     <input class="form-check-input" asp-for="Pagado" /> @Html.DisplayNameFor(model => model.Pagado)
                 </label>
             </div>
             <div class="form-group">
-                <label asp-for="Horario" class="control-label"></label>
-                <input asp-for="Horario" class="form-control" />
-                <span asp-validation-for="Horario" class="text-danger"></span>
+                <label asp-for="Día" class="control-label"></label>
+                <input asp-for="Día" class="form-control" />
+                <span asp-validation-for="Día" class="text-danger"></span>
             </div>
+            @if (!string.IsNullOrEmpty(diaerrorneo))
+            {
+                <div class="alert alert-danger">
+                    @diaerrorneo
+                </div>
+            }
+            @if (!string.IsNullOrEmpty(muchodias))
+            {
+                <div class="alert alert-danger">
+                    @muchodias
+                </div>
+            }
+            <div class="form-group">
+                <label asp-for="Hora" class="control-label"></label>
+                <input asp-for="Hora" class="form-control" />
+                <span asp-validation-for="Hora" class="text-danger"></span>
+            </div>
+            @if (!string.IsNullOrEmpty(errorMensaje))
+            {
+                <div class="alert alert-danger">
+                    @errorMensaje
+                </div>
+            }
             <div class="form-group">
                 <label asp-for="ID_Doctor" class="control-label"></label>
                 <select asp-for="ID_Doctor" class="form-control" asp-items="ViewBag.ID_Doctor"></select>
                 <span asp-validation-for="ID_Doctor" class="text-danger"></span>
             </div>
-            <div class="form-group">
+           @* <div class="form-group">
                 <label asp-for="ID_Receta_Medica" class="control-label"></label>
                 <select asp-for="ID_Receta_Medica" class="form-control" asp-items="ViewBag.ID_Receta_Medica"></select>
                 <span asp-validation-for="ID_Receta_Medica" class="text-danger"></span>
-            </div>
+            </div>*@
             <div class="form-group">
                 <label asp-for="ID_Paciente" class="control-label"></label>
                 <select asp-for="ID_Paciente" class="form-control" asp-items="ViewBag.ID_Paciente"></select>

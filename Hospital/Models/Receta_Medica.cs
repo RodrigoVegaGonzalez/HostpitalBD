@@ -11,12 +11,28 @@ namespace Hospital.Models
         public int ID_Receta { get; set; }
 
         [Required]
-        public string Especificaciones { get; set; }
+        public string Diagnostico { get; set; }
 
+        public DateTime Fecha { get; set; }
+
+        public string Tratamiento { get; set; }
+
+        public DateTime Duracion { get; set; }
+
+        public string Especificaciones { get; set; }
 
         [ForeignKey("Doctor")]
         public int ID_Doctor { get; set; }
 
-        public Cita Cita { get; set; }
+        public Doctor? Doctor { get; set; }
+
+        [ForeignKey("Medicina")]
+        public int ID_Medicina { get; set; }
+
+        public Medicina? Medicina { get; set; }
+
+        [ForeignKey("Cita")]
+        public int ID_Cita { get; set; }
+        public Cita? Cita { get; set; }
     }
 }

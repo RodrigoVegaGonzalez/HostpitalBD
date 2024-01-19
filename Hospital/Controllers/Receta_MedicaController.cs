@@ -22,9 +22,23 @@ namespace Hospital.Controllers
         // GET: Receta_Medica
         public async Task<IActionResult> Index()
         {
-              return _context.Receta_Medica != null ? 
-                          View(await _context.Receta_Medica.ToListAsync()) :
-                          Problem("Entity set 'ApplicationDbContext.Receta_Medica'  is null.");
+            var applicationDbContext = _context.Receta_Medica
+                .Include(r => r.Cita)
+                .Include(r => r.Doctor)
+                 .Include(r => r.Doctor.Usuario)
+                .Include(r => r.Medicina);
+            return View(await applicationDbContext.ToListAsync());
+        }
+
+        public async Task<IActionResult> IndexDoctor(int id)
+        {
+            var applicationDbContext = _context.Receta_Medica
+                .Include(r => r.Cita)
+                .Include(r => r.Doctor)
+                 .Include(r => r.Doctor.Usuario)
+                .Include(r => r.Medicina)
+                .Where(u => u.ID_Doctor == id);
+            return View(await applicationDbContext.ToListAsync());
         }
 
         // GET: Receta_Medica/Details/5
@@ -36,6 +50,9 @@ namespace Hospital.Controllers
             }
 
             var receta_Medica = await _context.Receta_Medica
+                .Include(r => r.Cita)
+                .Include(r => r.Doctor)
+                .Include(r => r.Medicina)
                 .FirstOrDefaultAsync(m => m.ID_Receta == id);
             if (receta_Medica == null)
             {
@@ -48,7 +65,47 @@ namespace Hospital.Controllers
         // GET: Receta_Medica/Create
         public IActionResult Create()
         {
+            ViewData["ID_Cita"] = new SelectList(_context.Cita, "ID_Cita", "ID_Cita");
+            ViewData["ID_Doctor"] = new SelectList(_context.Doctor, "ID_Doctor", "ID_Doctor");
+            ViewData["ID_Medicina"] = new SelectList(_context.Medicina, "ID_Medicina", "Nombre");
             return View();
+        }
+
+        public IActionResult CreateCita(int id)
+        {
+            ViewBag.Id = id;
+            ViewData["ID_Cita"] = new SelectList(_context.Cita.Where(u => u.ID_Cita == id), "ID_Cita", "ID_Cita");
+            ViewData["ID_Doctor"] = new SelectList(_context.Doctor, "ID_Doctor", "ID_Doctor");
+            ViewData["ID_Medicina"] = new SelectList(_context.Medicina, "ID_Medicina", "Nombre");
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateCita([Bind("ID_Receta,Diagnostico,Tratamiento,Duracion,Especificaciones,ID_Doctor,ID_Medicina,ID_Cita")] Receta_Medica receta_Medica)
+        {
+            var doctor = _context.Cita.Where(u => u.ID_Cita == receta_Medica.ID_Cita).FirstOrDefault();
+            Receta_Medica receta = new Receta_Medica()
+            {
+                Diagnostico = receta_Medica.Diagnostico,
+                Fecha = DateTime.Now,
+                Tratamiento = receta_Medica.Tratamiento,
+                Duracion = receta_Medica.Duracion,
+                Especificaciones = receta_Medica.Especificaciones,
+                ID_Doctor = doctor.ID_Doctor,
+                ID_Medicina = receta_Medica.ID_Medicina,
+                ID_Cita = receta_Medica.ID_Cita
+            };
+            if (ModelState.IsValid)
+            {
+                _context.Add(receta);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            ViewData["ID_Cita"] = new SelectList(_context.Cita, "ID_Cita", "ID_Cita", receta_Medica.ID_Cita);
+            ViewData["ID_Doctor"] = new SelectList(_context.Doctor, "ID_Doctor", "ID_Doctor", receta_Medica.ID_Doctor);
+            ViewData["ID_Medicina"] = new SelectList(_context.Medicina, "ID_Medicina", "Nombre", receta_Medica.ID_Medicina);
+            return View(receta_Medica);
         }
 
         // POST: Receta_Medica/Create
@@ -56,14 +113,29 @@ namespace Hospital.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ID_Receta,Especificaciones,ID_Doctor")] Receta_Medica receta_Medica)
+        public async Task<IActionResult> Create([Bind("ID_Receta,Diagnostico,Tratamiento,Duracion,Especificaciones,ID_Doctor,ID_Medicina,ID_Cita")] Receta_Medica receta_Medica)
         {
+            var doctor = _context.Cita.Where(u => u.ID_Cita == receta_Medica.ID_Cita).FirstOrDefault();
+            Receta_Medica receta = new Receta_Medica()
+            {
+                Diagnostico = receta_Medica.Diagnostico,
+                Fecha = DateTime.Now,
+                Tratamiento = receta_Medica.Tratamiento,
+                Duracion = receta_Medica.Duracion,
+                Especificaciones = receta_Medica.Especificaciones,
+                ID_Doctor = doctor.ID_Doctor,
+                ID_Medicina = receta_Medica.ID_Medicina,
+                ID_Cita = receta_Medica.ID_Cita
+            };
             if (ModelState.IsValid)
             {
-                _context.Add(receta_Medica);
+                _context.Add(receta);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+            ViewData["ID_Cita"] = new SelectList(_context.Cita, "ID_Cita", "ID_Cita", receta_Medica.ID_Cita);
+            ViewData["ID_Doctor"] = new SelectList(_context.Doctor, "ID_Doctor", "ID_Doctor", receta_Medica.ID_Doctor);
+            ViewData["ID_Medicina"] = new SelectList(_context.Medicina, "ID_Medicina", "Nombre", receta_Medica.ID_Medicina);
             return View(receta_Medica);
         }
 
@@ -80,6 +152,9 @@ namespace Hospital.Controllers
             {
                 return NotFound();
             }
+            ViewData["ID_Cita"] = new SelectList(_context.Cita, "ID_Cita", "ID_Cita", receta_Medica.ID_Cita);
+            ViewData["ID_Doctor"] = new SelectList(_context.Doctor, "ID_Doctor", "ID_Doctor", receta_Medica.ID_Doctor);
+            ViewData["ID_Medicina"] = new SelectList(_context.Medicina, "ID_Medicina", "Nombre", receta_Medica.ID_Medicina);
             return View(receta_Medica);
         }
 
@@ -88,7 +163,7 @@ namespace Hospital.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ID_Receta,Especificaciones,ID_Doctor")] Receta_Medica receta_Medica)
+        public async Task<IActionResult> Edit(int id, [Bind("ID_Receta,Diagnostico,Fecha,Tratamiento,Duracion,Especificaciones,ID_Doctor,ID_Medicina,ID_Cita")] Receta_Medica receta_Medica)
         {
             if (id != receta_Medica.ID_Receta)
             {
@@ -115,6 +190,9 @@ namespace Hospital.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+            ViewData["ID_Cita"] = new SelectList(_context.Cita, "ID_Cita", "ID_Cita", receta_Medica.ID_Cita);
+            ViewData["ID_Doctor"] = new SelectList(_context.Doctor, "ID_Doctor", "ID_Doctor", receta_Medica.ID_Doctor);
+            ViewData["ID_Medicina"] = new SelectList(_context.Medicina, "ID_Medicina", "Nombre", receta_Medica.ID_Medicina);
             return View(receta_Medica);
         }
 
@@ -127,6 +205,9 @@ namespace Hospital.Controllers
             }
 
             var receta_Medica = await _context.Receta_Medica
+                .Include(r => r.Cita)
+                .Include(r => r.Doctor)
+                .Include(r => r.Medicina)
                 .FirstOrDefaultAsync(m => m.ID_Receta == id);
             if (receta_Medica == null)
             {

@@ -7,8 +7,10 @@ namespace Hospital.Models
     {
 
         [Key]
-        public int Id_Especialidad { get; set; }
+        public int ID_Especialidad { get; set; }
 
         public string Nombre { get; set; }
+
+        public Doctor? Doctor { get; set; }
     }
 }

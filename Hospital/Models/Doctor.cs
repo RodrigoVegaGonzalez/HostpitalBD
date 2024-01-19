@@ -14,16 +14,21 @@ namespace Hospital.Models
 
         public Usuario Usuario { get; set; }
 
+        public string Cedula { get; set; }
+
         public List<Horario_Doctor> Horario_Doctor { get; set; }
 
         public List<Receta_Medica> Receta_Medica { get; set; }
 
-        public List<Especialidad>? Especialidad { get; set; }
+        [ForeignKey("Especialidad")]
+        public int? ID_Especialidad { get; set; }
+
+        public Especialidad Especialidad { get; set; }
 
         public List<Cita> Cita { get; set; }
 
         [ForeignKey("Consultorio")]
-        public int? id_Consultorio { get; set; }
+        public int? ID_Consultorio { get; set; }
 
         public Consultorio? Consultorio { get; set; }
     }

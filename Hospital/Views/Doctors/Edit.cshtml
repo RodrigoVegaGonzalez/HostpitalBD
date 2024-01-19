@@ -15,7 +15,13 @@
             <input type="hidden" asp-for="ID_Doctor" />
             <div class="form-group">
                 <label asp-for="Consultorio" class="control-label"></label>
-                <input asp-for="Consultorio" class="form-control" />
+                <select asp-for="Consultorio" class="form-control">
+                    <option>Seleccionar</option>
+                    @foreach (var consultorio in ViewBag.Consultorio)
+                    {
+                        <option value="@consultorio.ID_Consultorio">@consultorio.Nombre</option>
+                    }
+                </select>
                 <span asp-validation-for="Consultorio" class="text-danger"></span>
             </div>
             <div class="form-group">

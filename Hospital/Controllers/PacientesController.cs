@@ -130,8 +130,6 @@ namespace Hospital.Controllers
                 return NotFound();
             }
 
-           
-
             var paciente = await _context.Paciente
                 .Include(p => p.Usuario)
                 .FirstOrDefaultAsync(m => m.ID_Paciente == id);
@@ -148,13 +146,21 @@ namespace Hospital.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var cita = await _context.Cita
-            .Where(c => c.ID_Paciente == id && c.Horario > DateTime.Now)
-             .FirstOrDefaultAsync();
-
-            if (cita == null)
+            var cita = _context.Cita.Where(u => u.ID_Paciente.Equals(id)).ToList();
+            var pac = await _context.Paciente
+                .Include(p => p.Usuario)
+                .FirstOrDefaultAsync(m => m.ID_Paciente == id);
+            if (cita.Any())
             {
-                return Problem("El paciente tiene citas asignadas");
+                foreach (var c in cita)
+                {
+                    if(DateTime.Now <  c.Día )
+                    {
+                        ViewBag.Error = "El paciente tiene citas asigandas";
+                         return View(pac);
+                    } 
+                }
+               
             }
             if (_context.Paciente == null)
             {

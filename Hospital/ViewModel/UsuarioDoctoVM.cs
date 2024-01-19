@@ -30,6 +30,12 @@ namespace Hospital.ViewModel
         [Display(Name = "Email")]
         public string Email { get; set; }
 
+        [Required(ErrorMessage = "El campo CURP es obligatorio.")]
+        [RegularExpression(@"^[A-Z]{4}[0-9]{6}[HM]{1}[A-Z]{5}[0-9]{2}$", ErrorMessage = "El formato de CURP no es válido.")]
+        public string CURP { get; set; }
+
+        public string? Cedula { get; set; }
+
         [Required]
         [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
         [DataType(DataType.Password)]

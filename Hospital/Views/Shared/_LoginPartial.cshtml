@@ -2,9 +2,50 @@
 @inject SignInManager<IdentityUser> SignInManager
 @inject UserManager<IdentityUser> UserManager
 
+
+
 <ul class="navbar-nav">
-@if (SignInManager.IsSignedIn(User))
+    
+
+       
+    
+    @if (SignInManager.IsSignedIn(User))
 {
+        var user = await UserManager.FindByNameAsync(User.Identity.Name);
+
+        if (user != null)
+        {
+            var roles = await UserManager.GetRolesAsync(user);
+
+            if (roles.Contains("Recepcionista"))
+            {
+                <li class="nav-item">
+                    <a class="nav-link text-dark" asp-area="" asp-controller="Doctors" asp-action="Index">Doctores</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-dark" asp-area="" asp-controller="Citas" asp-action="Index">Citas</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-dark" asp-area="" asp-controller="Pacientes" asp-action="Index">Pacientes</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-dark" asp-area="" asp-controller="Recepcionistas" asp-action="Index">Recepcionista</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-dark" asp-area="" asp-controller="Consultorios" asp-action="Index">Consultorios</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-dark" asp-area="" asp-controller="Especialidads" asp-action="Index">Especialidades</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-dark" asp-area="" asp-controller="Medicinas" asp-action="Index">Medicinas</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-dark" asp-area="" asp-controller="Receta_Medica" asp-action="Index">Recetas Medicas</a>
+                </li>
+            }
+
+        }
     <li class="nav-item">
         <a  class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @User.Identity?.Name!</a>
     </li>
